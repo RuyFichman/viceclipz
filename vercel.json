@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo Static frontend: no dependencies required",
+  "buildCommand": "node build-vercel.mjs"
+}

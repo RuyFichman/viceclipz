@@ -1,0 +1,12 @@
+.git
+.npm-cache
+node_modules
+data
+.test-data*
+test-results
+.env
+.env.*
+.vercel
+backups
+*.log
+.openai

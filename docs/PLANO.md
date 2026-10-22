@@ -22,13 +22,19 @@ Oportunidades: mostrar o produto antes de pedir contratação; permitir revisar 
 - Critério: usuário cria, revisa, salva, encontra e reabre um rascunho; a interface distingue simulação de operação real.
 - Limites: sem contas, backend, renderização, exportação de vídeo, IA, conexão social ou cobrança. Vídeos não são persistidos, apenas os metadados do rascunho. Não existe sincronização entre dispositivos.
 
-### 2. MVP funcional — próxima execução
+### 2. MVP funcional — implementada localmente
+
+Entrega v0.2: contas, uploads privados, corte, enquadramento, composição de headline, fila FFmpeg e download MP4 nas três proporções. Ver [guia operacional](MVP.md) para os limites e verificações. A implantação pública continua na etapa 3. Para execução autônoma, SQLite e disco privado substituem nesta versão PostgreSQL/object storage; downloads passam pela sessão autenticada em vez de URLs externas assinadas. As exportações não têm cobrança nesta etapa.
+
+Escopo originalmente definido:
 
 Construir uma fatia vertical: cadastro → upload → composição → fila de render → download MP4. Autenticação, isolamento por workspace, banco persistente, armazenamento privado, URLs assinadas e limites de upload. Editor com corte, posição do texto, proporção e templates versionados. Worker de mídia separado executando FFmpeg; jobs idempotentes com progresso, cancelamento, retries limitados e contabilização somente conforme política explícita. Prévia e render devem usar a mesma especificação de composição.
 
 Critérios: dois usuários não acessam arquivos um do outro; vídeo real gera MP4 reproduzível nas três proporções; reprocessamento não duplica a cobrança; falhas podem ser recuperadas; cotas e erros são visíveis; testes de integração cobrem upload, renderização e autorização.
 
-### 3. Operação e lançamento — execução posterior
+### 3. Operação e lançamento — código integrado; ativação externa pendente
+
+Entrega v0.3: telas de contas conectadas, publicações e planos; OAuth Instagram/YouTube; agendador persistente; Stripe; cotas; build Vercel e backend Docker. Ver [guia de deploy](DEPLOY-VERCEL.md) para configuração e pendências. A produção começa como beta por convite. Não houve publicação real em rede social, transação Stripe ou deploy remoto sem credenciais.
 
 Começar por uma rede social via API oficial; ampliar conforme aprovação de apps e demanda. OAuth, tokens protegidos, calendário, fuso horário explícito, webhooks e prevenção de posts duplicados. Assinaturas, cotas claras, portal de cancelamento, eventos de uso, monitoramento, backups e documentação operacional. Landing page comercial com demonstração real, termos, privacidade e preços definidos após medir custos.
 
@@ -50,4 +56,8 @@ Decisão desta etapa: HTML/CSS/JS sem dependências de runtime para validar expe
 
 Primeiro valor: transformar um vídeo próprio em variações revisáveis e exportáveis. Scraping, repostagem em massa, biblioteca de vídeos de terceiros, formação e controle por agentes ficam fora do MVP inicial. Paridade com toda a oferta anunciada pelo concorrente não é critério de lançamento. Reavaliar após validação de uso e demanda.
 
-Métricas propostas (ainda não coletadas): tempo até primeira exportação, conclusão do primeiro projeto, falhas de renderização, custo por minuto renderizado e criadores ativos por semana.
+Métricas propostas: tempo até primeira exportação, conclusão do primeiro projeto, falhas de renderização, custo por minuto renderizado e criadores ativos por semana.
+
+## Ampliação autorizada em 22/10/2026
+
+A pedido do founder, antecipamos coleta de referências de sites/RSS/Atom e redes sociais (Instagram primeiro, TikTok em seguida), biblioteca privada e criação de rascunhos. A coleta guarda metadados e origem; não baixa vídeos de terceiros. Entregamos também a apresentação pública `/sobre` e métricas de uso/exportações/falhas por conta. Custos, criadores ativos e funil de ativação continuam pendentes. Ver [limites, configuração e testes](COLETA-METRICAS.md). Ativação externa e abertura pública continuam pendentes.

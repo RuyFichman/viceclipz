@@ -2,3 +2,13 @@ node_modules/
 *.tar.gz
 *.tgz
 .sites/
+.npm-cache/
+data/
+.test-data*/
+.env
+.env.*
+!.env.example
+.vercel/
+backups/
+*.log
+test-results/
