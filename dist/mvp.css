@@ -1,0 +1,484 @@
+.account-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(ellipse at top, #252c20, #101114 65%);
+}
+.account-box {
+  width: min(520px, 100%);
+  padding: 28px;
+  display: grid;
+  gap: 18px;
+  line-height: 1.6;
+}
+.account-box p,
+.account-box h1,
+.account-box h2 {
+  margin: 0;
+}
+.account-box label {
+  display: grid;
+  gap: 8px;
+}
+.account-box input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background: #101114;
+  color: #eee;
+  border: 1px solid #41444c;
+  font: inherit;
+}
+.account-actions {
+  display: grid;
+  gap: 12px;
+}
+.account-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+#account-dialog {
+  width: min(580px, 94vw);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 0;
+}
+#account-result,
+#verification-status {
+  overflow-wrap: anywhere;
+  color: #d4fa83;
+}
+#verification-email {
+  overflow-wrap: anywhere;
+}
+.auth-screen {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.auth-story {
+  padding: 48px 10%;
+  background: radial-gradient(ellipse at 80% 70%, #354023, #1a2017 70%);
+  overflow: hidden;
+  position: relative;
+}
+.auth-story > .brand {
+  margin-bottom: 80px;
+}
+.auth-story .brand span {
+  color: var(--lime);
+}
+.auth-story h1 {
+  font-size: clamp(36px, 4.5vw, 68px);
+  line-height: 1.07;
+  letter-spacing: -3px;
+  margin-bottom: 24px;
+}
+.auth-story > p {
+  color: #b4bca9;
+  line-height: 1.8;
+}
+.auth-story > small {
+  position: relative;
+  margin-top: 36px;
+}
+.auth-art {
+  height: 220px;
+  position: relative;
+  margin-top: 40px;
+}
+.auth-art span {
+  font:
+    700 44px/0.95 "Space Grotesk",
+    sans-serif;
+  position: absolute;
+  z-index: 2;
+  transform: rotate(-5deg);
+  top: 30px;
+}
+.auth-art em {
+  font-style: normal;
+  color: var(--lime);
+}
+.auth-art i {
+  display: block;
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  left: 100px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #edffbb,
+    #92b749 45%,
+    #24331b 74%
+  );
+  box-shadow: 0 0 60px #d4fa8310;
+}
+.auth-panel {
+  display: grid;
+  place-items: center;
+  padding: 40px;
+}
+.auth-box {
+  width: 100%;
+  max-width: 350px;
+}
+.auth-box h2 {
+  font-size: 30px;
+  letter-spacing: -1px;
+}
+.auth-box > p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.auth-box form {
+  margin-top: 30px;
+}
+.auth-box form .primary {
+  width: 100%;
+  padding: 15px;
+}
+.auth-box label {
+  font-size: 12px;
+}
+.auth-box input {
+  padding: 14px;
+}
+.text-button {
+  color: var(--lime);
+  background: transparent;
+  margin: 22px 0;
+  font-size: 12px;
+  padding: 0;
+}
+.error {
+  font-size: 12px;
+  color: #f6b0ad;
+  line-height: 1.6;
+}
+.error:empty {
+  display: none;
+}
+.sidebar-bottom > .secondary {
+  width: 100%;
+  margin-bottom: 12px;
+}
+.sidebar-bottom > .field-help {
+  margin: 0 0 16px;
+  text-align: center;
+}
+.sidebar .phase {
+  margin-bottom: 15px;
+}
+.profile {
+  display: none;
+}
+.upload-label {
+  cursor: pointer;
+  margin: 0;
+}
+.project-row .actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.project-row .actions .secondary {
+  margin: 0;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.danger {
+  border: 1px solid #44353a;
+  color: #d29ba6;
+  background: #261f23;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.project-row > div:first-of-type {
+  min-width: 0;
+  flex: 1;
+}
+.project-row h3 {
+  line-height: 1.5;
+}
+.project-row .draft {
+  white-space: nowrap;
+}
+.empty.simple {
+  display: block;
+}
+.empty.simple p {
+  line-height: 1.8;
+}
+.job-progress {
+  height: 5px;
+  background: #343830;
+  border-radius: 9px;
+  overflow: hidden;
+  margin-top: 10px;
+  max-width: 380px;
+}
+.job-progress i {
+  display: block;
+  background: var(--lime);
+  height: 100%;
+  width: 0;
+}
+.job-meta {
+  color: #9da58e;
+  font-size: 11px;
+}
+.job-error {
+  color: #e4aaaa;
+  font-size: 11px;
+  margin-top: 8px;
+}
+.download-link {
+  background: var(--lime);
+  color: #1c2611;
+  padding: 11px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 650;
+}
+.check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.check-label input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--lime);
+}
+.preview-column {
+  align-self: start;
+  position: sticky;
+  top: 0;
+}
+.composition {
+  background: #090a0c;
+  color: #aaa;
+  max-height: none;
+  width: 100%;
+  max-width: 300px;
+  text-shadow: none;
+}
+.composition video {
+  object-fit: cover;
+}
+.composition #overlay-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.composition #no-video {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.composition video[hidden] ~ #overlay-preview {
+  opacity: 0.7;
+}
+#play-preview {
+  width: 100%;
+  margin-top: 16px;
+}
+.export-spec {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 15px;
+  margin-top: 20px;
+  font-size: 9px;
+  color: #a6b299;
+}
+.dialog-footer {
+  position: sticky;
+  bottom: -27px;
+  background: #17181d;
+  padding-bottom: 12px;
+  z-index: 5;
+}
+dialog {
+  width: min(920px, 94vw);
+}
+.editor-grid {
+  grid-template-columns: 1.15fr 1fr;
+}
+.editor-fields input,
+.editor-fields select {
+  margin-top: 6px;
+  padding: 9px;
+}
+.editor-fields label {
+  margin-bottom: 13px;
+}
+.editor-fields .field-row {
+  gap: 12px;
+}
+.editor-fields .field-help {
+  margin-top: -5px;
+}
+.editor-fields .field-row label {
+  min-width: 0;
+}
+button:disabled,
+input:disabled,
+select:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.hero-copy > p {
+  max-width: 400px;
+}
+#confirm-dialog {
+  max-width: 440px;
+}
+#confirm-message {
+  line-height: 1.7;
+  color: #a5a8b2;
+  font-size: 13px;
+}
+#storage-bar {
+  width: 0;
+}
+.asset-preview {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 7px;
+}
+.job-status.done {
+  color: var(--lime);
+}
+@media (max-width: 800px) {
+  .auth-screen {
+    grid-template-columns: 1fr;
+  }
+  .auth-story {
+    padding: 30px;
+  }
+  .auth-story > .brand {
+    margin-bottom: 35px;
+  }
+  .auth-story .tag,
+  .auth-story > small,
+  .auth-art {
+    display: none;
+  }
+  .auth-story h1 {
+    font-size: 38px;
+    letter-spacing: -1.5px;
+    margin-bottom: 14px;
+  }
+  .auth-story > p {
+    font-size: 12px;
+    margin: 0;
+  }
+  .auth-panel {
+    padding: 35px 25px;
+  }
+  .auth-box h2 {
+    font-size: 26px;
+  }
+  .sidebar-bottom {
+    display: none;
+  }
+  .sidebar .workspace {
+    display: none;
+  }
+  nav {
+    padding-bottom: 4px;
+  }
+  .project-row .actions {
+    width: 100%;
+    margin: 6px 0 0;
+  }
+  .project-row .actions .secondary {
+    margin: 0;
+  }
+  .preview-column {
+    position: static;
+  }
+  header .prototype {
+    font-size: 8px;
+  }
+}
+@media (max-width: 560px) {
+  .editor-grid {
+    grid-template-columns: 1fr;
+  }
+  .dialog-footer {
+    bottom: -20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .dialog-footer > span {
+    max-width: none;
+  }
+  .dialog-footer .actions {
+    justify-content: space-between;
+  }
+  .dialog-footer .actions > button {
+    flex: 1;
+  }
+  .preview-column .composition {
+    max-width: 210px;
+  }
+  .heading p {
+    line-height: 1.7;
+  }
+  .hero-art {
+    bottom: 0;
+  }
+  .section-heading h2 {
+    margin: 0;
+  }
+  .auth-box .eyebrow {
+    font-size: 8px;
+  }
+}
+.composition {
+  width: min(100%, calc(46vh * var(--ratio, 0.5625)));
+  max-width: 300px;
+}
+.mobile-logout {
+  display: none;
+}
+@media (max-width: 800px) {
+  .mobile-logout {
+    display: inline-flex;
+    padding: 7px 10px;
+    margin-left: 8px;
+    font-size: 10px;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+  }
+  .sidebar nav {
+    gap: 1px;
+  }
+  .sidebar nav a {
+    padding: 9px;
+  }
+}

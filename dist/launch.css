@@ -1,0 +1,110 @@
+.launch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin: 24px 0;
+}
+.launch-card {
+  background: #181a1f;
+  border: 1px solid #303238;
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-wrap: anywhere;
+}
+.launch-card h2,
+.launch-card h3,
+.launch-card p {
+  margin: 0;
+}
+.launch-card small {
+  color: #a7abb6;
+  line-height: 1.6;
+}
+.launch-card button {
+  align-self: flex-start;
+}
+.launch-card .tag {
+  align-self: flex-start;
+}
+.network-icon {
+  font-size: 36px;
+  color: #d4fa83;
+}
+.launch-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+.launch-empty {
+  padding: 40px;
+  border: 1px dashed #41444f;
+  border-radius: 18px;
+  color: #b3b6c0;
+  line-height: 1.7;
+}
+#schedule-dialog {
+  width: min(590px, 94vw);
+  max-height: 90vh;
+  overflow: auto;
+}
+#schedule-form {
+  display: grid;
+  gap: 16px;
+  padding: 26px;
+}
+#schedule-form label {
+  display: grid;
+  gap: 8px;
+}
+#schedule-form input,
+#schedule-form select,
+#schedule-form textarea {
+  width: 100%;
+  background: #101114;
+  border: 1px solid #41444c;
+  border-radius: 8px;
+  color: #eee;
+  padding: 12px;
+  font: inherit;
+}
+#schedule-form select option {
+  background: #101114;
+}
+#schedule-form .section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+.launch-card .actions {
+  flex-wrap: wrap;
+}
+#launch-message {
+  padding: 12px 0;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+@media (min-width: 801px) {
+  .sidebar {
+    overflow-y: auto;
+    padding-bottom: 16px;
+  }
+  .sidebar nav {
+    gap: 2px;
+  }
+  .sidebar nav a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .sidebar .workspace {
+    margin: 24px 0 20px;
+  }
+  .sidebar-bottom {
+    padding-top: 22px;
+  }
+}

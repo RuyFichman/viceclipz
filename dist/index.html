@@ -1,17 +1,460 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101114"><meta name="description" content="ViceClipz: um estúdio para transformar ideias em uma rotina de conteúdo. Protótipo interativo."><title>ViceClipz — Seu próximo conteúdo começa aqui</title><link rel="stylesheet" href="/styles.css"><script type="module" src="/app.js"></script></head>
-<body><a class="skip" href="#main">Ir para o conteúdo</a>
-<aside class="sidebar"><a href="#overview" class="brand"><span class="brand-icon">v<span>c</span></span>viceclipz<span class="beta">BETA</span></a><div class="workspace"><span class="avatar">V</span><div>Meu workspace<small>Creator studio</small></div><span class="muted">⌄</span></div><p class="nav-label">WORKSPACE</p><nav aria-label="Navegação principal"><a href="#overview" data-nav="overview"><span>◫</span>Visão geral</a><a href="#projects" data-nav="projects"><span>▱</span>Meus projetos <b id="project-count">0</b></a><a href="#templates" data-nav="templates"><span>▦</span>Templates <em>NOVO</em></a><a href="#calendar" data-nav="calendar"><span>▤</span>Calendário</a></nav><div class="sidebar-bottom"><div class="phase"><span class="live-dot"></span> Etapa 01 / 03<p>O começo de algo grande.</p><small>Explore seu novo estúdio.</small><div class="phase-track"><i></i></div></div><div class="profile"><span class="avatar">F</span><div>Founder<small>Workspace pessoal</small></div><span>⌘</span></div></div></aside>
-<div class="shell"><header><div class="breadcrumb">Workspace <span>/</span> <strong id="breadcrumb">Visão geral</strong></div><span class="prototype"><i></i> Protótipo interativo</span></header><main id="main">
-<section id="overview" class="page"><div class="heading"><div><p class="eyebrow">MENOS REPETIÇÃO. MAIS CRIAÇÃO.</p><h1>Seu conteúdo. Próximo nível<span>.</span></h1><p>Da primeira ideia ao próximo post. Tudo começa aqui.</p></div><button class="primary new-project"><span>＋</span> Novo projeto</button></div>
-<div class="hero"><div class="hero-copy"><span class="tag">SEU NOVO FLUXO CRIATIVO</span><h2>Uma boa ideia.<br><span>Muitas possibilidades.</span></h2><p>Transforme um vídeo em diferentes versões.<br>Encontre seu estilo. Crie no seu ritmo.</p><button class="light new-project">Criar meu primeiro projeto <span>↗</span></button><small>01 Importar <span>→</span> 02 Personalizar <span>→</span> 03 Revisar</small></div><div class="hero-art" aria-label="Ilustração de três formatos de conteúdo"><div class="orbit"></div><div class="mini-clip clip-left"><span>STORY / 9:16</span><div class="sun"></div><div class="mountain"></div><strong>UMA NOVA<br>PERSPECTIVA.</strong></div><div class="mini-clip clip-main"><span><i class="live-dot"></i> SEU PRÓXIMO CLIP</span><div class="art-grid"></div><div class="orb"></div><strong>CRIE.<br>RECRIE.<br><em>EXPLORE.</em></strong><div class="clip-bottom">▶ <span>00:15</span><i></i> ◧</div></div><div class="mini-clip clip-right"><span>FEED / 4:5</span><div class="pink-disc"></div><strong>IDEIAS QUE<br>GANHAM<br>MOVIMENTO.</strong></div><div class="float-label">✦ Sua ideia, em novas versões</div></div></div>
-<div class="stats"><div><span>Projetos no estúdio <i>▱</i></span><strong id="stat-projects">0</strong><small>Organize suas próximas ideias</small></div><div><span>Variações planejadas <i>▦</i></span><strong id="stat-variants">0</strong><small>Prévia antes de produzir</small></div><div><span>Formatos disponíveis <i>◩</i></span><strong>3 <em>formatos</em></strong><small>Vertical, quadrado e retrato</small></div><div><span>Seu próximo passo <i>↗</i></span><strong class="stat-text">Comece a criar</strong><small>Importe um vídeo para explorar</small></div></div>
-<div class="section-heading"><div><h2>Um formato para cada ideia</h2><p>Escolha um ponto de partida. Deixe com a sua cara.</p></div><a href="#templates">Ver todos os templates <span>↗</span></a></div><div class="template-grid" id="featured-templates"></div>
-<div class="section-heading"><div><h2>Seus projetos recentes</h2><p>Seu processo criativo, sempre por perto.</p></div><a href="#projects">Ver todos <span>↗</span></a></div><div id="recent-projects"></div><div class="notice"><span>◈</span><p><strong>Um estúdio em construção, com você.</strong> Esta versão permite explorar templates e salvar rascunhos neste navegador. Renderização e publicação chegam nas próximas etapas.</p><span class="version">v0.1</span></div></section>
-<section id="projects" class="page" hidden><div class="heading"><div><p class="eyebrow">DO RASCUNHO À PRÓXIMA IDEIA</p><h1>Meus projetos<span>.</span></h1><p>Os rascunhos ficam salvos somente neste navegador.</p></div><button class="primary new-project">＋ Novo projeto</button></div><label class="search">⌕ <input id="search" type="search" placeholder="Buscar projetos pelo nome" aria-label="Buscar projetos pelo nome"></label><div id="all-projects"></div></section>
-<section id="templates" class="page" hidden><div class="heading"><div><p class="eyebrow">ENCONTRE SUA LINGUAGEM</p><h1>Comece com um template<span>.</span></h1><p>Composições originais para testar a direção do seu conteúdo.</p></div></div><div class="filters" aria-label="Filtrar por formato"><button class="active" data-filter="all">Todos</button><button data-filter="9:16">Vertical · 9:16</button><button data-filter="1:1">Quadrado · 1:1</button><button data-filter="4:5">Retrato · 4:5</button></div><div class="template-grid" id="all-templates"></div></section>
-<section id="calendar" class="page" hidden><div class="heading"><div><p class="eyebrow">UMA ROTINA COM MAIS CLAREZA</p><h1>Calendário editorial<span>.</span></h1><p>Planeje a data dos seus rascunhos. Não há publicação automática nesta etapa.</p></div><button class="primary new-project">＋ Planejar conteúdo</button></div><div id="calendar-list"></div></section>
-<footer><a class="brand" href="#overview">viceclipz<span>✦</span></a><span>Feito para quem tem algo a criar.</span><span>ETAPA 01 — FUNDAÇÃO</span></footer>
-</main></div>
-<dialog id="editor"><form id="project-form"><div class="dialog-heading"><div><p class="eyebrow">SEU PRÓXIMO CONTEÚDO</p><h2 id="editor-heading">Novo projeto</h2></div><button type="button" class="icon-button" id="close-editor" aria-label="Fechar editor">×</button></div><div class="editor-grid"><div class="editor-fields"><label>Nome do projeto<input id="project-name" required maxlength="80" placeholder="Ex.: Os detalhes que ninguém viu"></label><label>Seu vídeo <span class="optional">opcional nesta prévia</span><input id="video-file" type="file" accept="video/mp4,video/webm,video/quicktime"></label><p class="field-help">Prévia local, até 100 MB. O arquivo não é enviado nem armazenado.</p><label>Headline<input id="headline" required maxlength="100" value="Uma nova perspectiva." placeholder="Uma ideia que merece ser vista"></label><div class="field-row"><label>Template<select id="template-select"></select></label><label>Formato<select id="format"><option>9:16</option><option>1:1</option><option>4:5</option></select></label></div><label>Data planejada <span class="optional">opcional</span><input id="planned-date" type="date"></label><button type="button" class="secondary" id="generate">✦ Explorar 3 headlines</button><div id="variants" class="variants"></div></div><div class="preview-column"><div class="preview-label">PRÉVIA DA COMPOSIÇÃO <span id="preview-format">9:16</span></div><div id="composition" class="composition neon"><video id="video-preview" controls playsinline hidden></video><div class="preview-decoration"></div><span class="preview-brand">VICECLIPZ / STUDIO</span><strong id="preview-headline">Uma nova perspectiva.</strong></div><p>Prévia visual. O vídeo original não é editado ou exportado nesta etapa.</p></div></div><p id="form-status" role="status"></p><div class="dialog-footer"><span>◉ Rascunho salvo neste dispositivo</span><button type="submit" class="primary">Salvar projeto <span>↗</span></button></div></form></dialog><div class="toast" id="toast" role="status" hidden></div>
-</body></html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#101114" />
+    <title>ViceClipz — Creator Studio</title>
+    <meta
+      name="description"
+      content="Importe, edite e exporte seus vídeos em um só estúdio."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/mvp.css" />
+    <link rel="stylesheet" href="/launch.css" />
+    <link rel="stylesheet" href="/growth.css" />
+    <script type="module" src="/studio.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Ir para o conteúdo</a>
+    <section id="auth-screen" class="auth-screen">
+      <div class="auth-story">
+        <a class="brand" href="/">viceclipz <span>✦</span></a
+        ><span class="tag">SEU ESPAÇO PARA CRIAR</span>
+        <h1>Da sua ideia.<br />Para o mundo<span>.</span></h1>
+        <p>
+          Um vídeo, novas possibilidades.<br />Importe, personalize e exporte em
+          MP4.
+        </p>
+        <div class="auth-art">
+          <span>CRIE.<br />RECRIE.<br /><em>EXPLORE.</em></span
+          ><i></i>
+        </div>
+        <small>Seu conteúdo. Seu ritmo. Seu próximo nível.</small>
+      </div>
+      <div class="auth-panel">
+        <div class="auth-box">
+          <p class="eyebrow">BEM-VINDO AO SEU ESTÚDIO</p>
+          <h2 id="auth-title">Bom te ver por aqui.</h2>
+          <p id="auth-copy">Entre para continuar criando.</p>
+          <form id="auth-form">
+            <label id="name-label" hidden
+              >Seu nome<input
+                id="auth-name"
+                maxlength="60"
+                autocomplete="name" /></label
+            ><label
+              >E-mail<input
+                id="auth-email"
+                type="email"
+                required
+                maxlength="254"
+                autocomplete="username"
+                placeholder="voce@exemplo.com" /></label
+            ><label
+              >Senha<input
+                id="auth-password"
+                type="password"
+                required
+                minlength="10"
+                maxlength="128"
+                autocomplete="current-password"
+                placeholder="Pelo menos 10 caracteres"
+            /></label>
+            <p id="auth-error" class="error" role="alert"></p>
+            <button class="primary" id="auth-submit">
+              Entrar no estúdio ↗
+            </button>
+          </form>
+          <button class="text-button" id="auth-toggle">
+            Ainda não tem conta? Criar conta
+          </button>
+          <p class="field-help">
+            <a href="/sobre">Conheça o ViceClipz ↗</a><br />
+            Até 100 MB por vídeo · exportações de até 2 minutos.<br />Contas e
+            arquivos ficam neste servidor.
+          </p>
+        </div>
+      </div>
+    </section>
+    <div id="app" hidden>
+      <aside class="sidebar">
+        <a href="#overview" class="brand"
+          ><span class="brand-icon">v<span>c</span></span
+          >viceclipz<span class="beta">MVP</span></a
+        >
+        <div class="workspace">
+          <span class="avatar" id="user-avatar">V</span>
+          <div>
+            <span id="user-name">Meu workspace</span
+            ><small>Creator studio</small>
+          </div>
+        </div>
+        <p class="nav-label">WORKSPACE</p>
+        <nav aria-label="Navegação principal">
+          <a href="#overview" data-nav="overview"><span>◫</span>Visão geral</a
+          ><a href="#projects" data-nav="projects"
+            ><span>▱</span>Meus projetos <b id="project-count">0</b></a
+          ><a href="#templates" data-nav="templates"><span>▦</span>Templates</a
+          ><a href="#library" data-nav="library"><span>▣</span>Meus vídeos</a
+          ><a href="#exports" data-nav="exports"
+            ><span>↓</span>Exportações <b id="job-count">0</b></a
+          ><a href="#calendar" data-nav="calendar"><span>▤</span>Calendário</a>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="phase">
+            <span class="live-dot"></span> Etapa 03 / 03
+            <p>Pronto para dar play.</p>
+            <small id="storage-label">0 MB de 2 GB</small>
+            <div class="phase-track"><i id="storage-bar"></i></div>
+          </div>
+          <button class="secondary" id="logout">Sair da conta ↗</button>
+          <p class="field-help">Vídeos privados · MP4 real</p>
+        </div>
+      </aside>
+      <div class="shell">
+        <header>
+          <div class="breadcrumb">
+            Workspace <span>/</span>
+            <strong id="breadcrumb">Visão geral</strong>
+          </div>
+          <div class="header-actions">
+            <span class="prototype"><i></i> Creator Studio · MVP</span
+            ><button id="logout-mobile" class="secondary mobile-logout">
+              Sair
+            </button>
+          </div>
+        </header>
+        <main id="main">
+          <p id="global-error" class="error" role="alert" hidden></p>
+          <section id="overview" class="page">
+            <div class="heading">
+              <div>
+                <p class="eyebrow">MENOS REPETIÇÃO. MAIS CRIAÇÃO.</p>
+                <h1>Seu conteúdo. Próximo nível<span>.</span></h1>
+                <p>Da primeira ideia ao próximo vídeo. Tudo começa aqui.</p>
+              </div>
+              <button class="primary new-project">＋ Novo projeto</button>
+            </div>
+            <div class="hero">
+              <div class="hero-copy">
+                <span class="tag">SEU FLUXO CRIATIVO, COMPLETO</span>
+                <h2>Uma boa ideia.<br /><span>Muitas possibilidades.</span></h2>
+                <p>
+                  Faça o corte. Encontre o enquadramento.<br />Dê a sua
+                  identidade e exporte em MP4.
+                </p>
+                <button class="light new-project">
+                  Criar meu próximo vídeo ↗</button
+                ><small
+                  >01 Importar <span>→</span> 02 Editar <span>→</span> 03
+                  Exportar</small
+                >
+              </div>
+              <div class="hero-art" aria-label="Composições de vídeo">
+                <div class="orbit"></div>
+                <div class="mini-clip clip-left">
+                  <span>STORY / 9:16</span>
+                  <div class="sun"></div>
+                  <div class="mountain"></div>
+                  <strong>UMA NOVA<br />PERSPECTIVA.</strong>
+                </div>
+                <div class="mini-clip clip-main">
+                  <span>SEU PRÓXIMO CLIP</span>
+                  <div class="art-grid"></div>
+                  <div class="orb"></div>
+                  <strong>CRIE.<br />RECRIE.<br /><em>EXPLORE.</em></strong>
+                  <div class="clip-bottom">▶ <span>00:15</span><i></i> ◧</div>
+                </div>
+                <div class="mini-clip clip-right">
+                  <span>FEED / 4:5</span>
+                  <div class="pink-disc"></div>
+                  <strong>IDEIAS EM<br />MOVIMENTO.</strong>
+                </div>
+              </div>
+            </div>
+            <div class="stats">
+              <div>
+                <span>Projetos no estúdio</span
+                ><strong id="stat-projects">0</strong
+                ><small>Suas ideias, organizadas</small>
+              </div>
+              <div>
+                <span>Vídeos na biblioteca</span
+                ><strong id="stat-assets">0</strong
+                ><small>Prontos para reutilizar</small>
+              </div>
+              <div>
+                <span>MP4 prontos</span><strong id="stat-exports">0</strong
+                ><small>Disponíveis para download</small>
+              </div>
+              <div>
+                <span>Na fila de criação</span
+                ><strong id="stat-active">0</strong
+                ><small>Processamento em segundo plano</small>
+              </div>
+            </div>
+            <div class="section-heading">
+              <div>
+                <h2>Um formato para cada ideia</h2>
+                <p>Escolha uma direção. Deixe com a sua cara.</p>
+              </div>
+              <a href="#templates">Ver templates ↗</a>
+            </div>
+            <div id="featured-templates" class="template-grid"></div>
+            <div class="section-heading">
+              <h2>Seus projetos recentes</h2>
+              <a href="#projects">Ver todos ↗</a>
+            </div>
+            <div id="recent-projects"></div>
+          </section>
+          <section id="projects" class="page" hidden>
+            <div class="heading">
+              <div>
+                <p class="eyebrow">DO RASCUNHO AO MP4</p>
+                <h1>Meus projetos<span>.</span></h1>
+                <p>Continue de onde parou. Seus vídeos estão salvos.</p>
+              </div>
+              <button class="primary new-project">＋ Novo projeto</button>
+            </div>
+            <label class="search"
+              ><input
+                id="search"
+                type="search"
+                placeholder="Buscar projetos pelo nome"
+                aria-label="Buscar projetos pelo nome"
+            /></label>
+            <div id="all-projects"></div>
+          </section>
+          <section id="templates" class="page" hidden>
+            <div class="heading">
+              <div>
+                <p class="eyebrow">ENCONTRE SUA LINGUAGEM</p>
+                <h1>Comece com um template<span>.</span></h1>
+                <p>Três identidades. Todos os formatos. A sua história.</p>
+              </div>
+            </div>
+            <div class="filters" aria-label="Filtrar templates">
+              <button class="active" data-filter="all" aria-pressed="true">
+                Todos</button
+              ><button data-filter="9:16" aria-pressed="false">
+                Vertical · 9:16</button
+              ><button data-filter="1:1" aria-pressed="false">
+                Quadrado · 1:1</button
+              ><button data-filter="4:5" aria-pressed="false">
+                Retrato · 4:5
+              </button>
+            </div>
+            <div class="template-grid" id="all-templates"></div>
+          </section>
+          <section id="library" class="page" hidden>
+            <div class="heading">
+              <div>
+                <p class="eyebrow">A MATÉRIA-PRIMA DAS SUAS IDEIAS</p>
+                <h1>Meus vídeos<span>.</span></h1>
+                <p>
+                  Até 100 MB e 10 minutos por vídeo. 2 GB de espaço por conta.
+                </p>
+              </div>
+              <button class="primary" id="upload-button">↑ Enviar vídeo</button
+              ><input
+                id="library-upload"
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime"
+                hidden
+              />
+            </div>
+            <p id="library-status" role="status"></p>
+            <div id="asset-list"></div>
+          </section>
+          <section id="exports" class="page" hidden>
+            <div class="heading">
+              <div>
+                <p class="eyebrow">SEU CONTEÚDO, PRONTO PARA SAIR</p>
+                <h1>Exportações<span>.</span></h1>
+                <p>
+                  MP4 · H.264 · 30 fps · até 2 minutos por corte. Nenhuma
+                  cobrança neste MVP.
+                </p>
+              </div>
+            </div>
+            <div id="job-list" aria-live="polite"></div>
+          </section>
+          <section id="calendar" class="page" hidden>
+            <div class="heading">
+              <div>
+                <p class="eyebrow">SUA ROTINA CRIATIVA</p>
+                <h1>Calendário editorial<span>.</span></h1>
+                <p>
+                  Projetos organizados pela data planejada. Sem publicação
+                  automática nesta etapa.
+                </p>
+              </div>
+            </div>
+            <div id="calendar-list"></div>
+          </section>
+          <footer>
+            <a class="brand" href="#overview">viceclipz <span>✦</span></a
+            ><span>Feito para quem tem algo a criar.</span
+            ><span>ETAPA 03 — PUBLICAÇÃO E ASSINATURAS</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+    <dialog id="editor">
+      <form id="project-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">SEU PRÓXIMO CONTEÚDO</p>
+            <h2 id="editor-heading">Novo projeto</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            id="close-editor"
+            aria-label="Fechar editor"
+          >
+            ×
+          </button>
+        </div>
+        <div class="editor-grid">
+          <div class="editor-fields">
+            <label
+              >Nome do projeto<input
+                id="project-name"
+                required
+                maxlength="80"
+                placeholder="Ex.: Os detalhes que ninguém viu" /></label
+            ><label
+              >Vídeo da biblioteca<select id="asset-select">
+                <option value="">Selecione um vídeo</option>
+              </select></label
+            ><label
+              >Ou envie um vídeo<input
+                id="video-file"
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime"
+            /></label>
+            <p id="upload-status" class="field-help" role="status">
+              MP4, MOV ou WebM · até 100 MB.
+            </p>
+            <div class="field-row">
+              <label
+                >Início (segundos)<input
+                  id="trim-start"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value="0"
+                  required /></label
+              ><label
+                >Fim (segundos)<input
+                  id="trim-end"
+                  type="number"
+                  min="0.25"
+                  step="0.01"
+                  value="10"
+                  required
+              /></label>
+            </div>
+            <label
+              >Headline <span class="optional">opcional</span
+              ><input
+                id="headline"
+                maxlength="100"
+                placeholder="Uma nova perspectiva."
+            /></label>
+            <div class="field-row">
+              <label>Template<select id="template-select"></select></label
+              ><label
+                >Formato<select id="format">
+                  <option>9:16</option>
+                  <option>1:1</option>
+                  <option>4:5</option>
+                </select></label
+              >
+            </div>
+            <div class="field-row">
+              <label
+                >Posição do texto<select id="position">
+                  <option value="bottom">Embaixo</option>
+                  <option value="center">Centro</option>
+                  <option value="top">Em cima</option>
+                </select></label
+              ><label
+                >Tamanho do texto<select id="font-size">
+                  <option value="32">Pequeno</option>
+                  <option value="42" selected>Médio</option>
+                  <option value="56">Grande</option>
+                </select></label
+              >
+            </div>
+            <label
+              >Enquadramento<select id="fit">
+                <option value="cover">Preencher (corte central)</option>
+                <option value="contain">Mostrar inteiro (com bordas)</option>
+              </select></label
+            ><label class="check-label"
+              ><input type="checkbox" id="mute" /> Remover áudio</label
+            ><label
+              >Data planejada
+              <span class="optional">sem publicação automática</span
+              ><input id="planned-date" type="date"
+            /></label>
+          </div>
+          <div class="preview-column">
+            <div class="preview-label">
+              PRÉVIA DA COMPOSIÇÃO <span id="preview-format">9:16</span>
+            </div>
+            <div id="composition" class="composition">
+              <video
+                id="video-preview"
+                playsinline
+                preload="metadata"
+                hidden
+              ></video>
+              <div id="no-video">Selecione um vídeo<br />para começar.</div>
+              <img id="overlay-preview" alt="Composição de texto" hidden />
+            </div>
+            <button type="button" class="secondary" id="play-preview">
+              ▶ Reproduzir corte
+            </button>
+            <p id="preview-status" role="status">
+              A prévia usa a mesma composição aplicada ao MP4.
+            </p>
+            <div class="export-spec">
+              <span id="export-dimensions">720 × 1280</span
+              ><span>MP4 / H.264</span>
+            </div>
+            <p>
+              Salvar mantém o projeto editável. Exportar cria um arquivo novo na
+              fila, sem alterar o vídeo original.
+            </p>
+          </div>
+        </div>
+        <p id="form-status" class="error" role="alert"></p>
+        <div class="dialog-footer">
+          <span>Salvo na sua conta</span>
+          <div class="actions">
+            <button type="submit" class="secondary" id="save-project">
+              Salvar projeto</button
+            ><button type="button" class="primary" id="export-project">
+              Exportar MP4 ↗
+            </button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="confirm-dialog">
+      <form method="dialog">
+        <h2>Remover este item?</h2>
+        <p id="confirm-message"></p>
+        <div class="actions">
+          <button value="cancel" class="secondary">Manter</button
+          ><button value="delete" class="primary">Remover</button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+node_modules
+.npm-cache
+.git
+.env*
+data
+.test-data*
+test-results
+backups
+.sites
+*.tar.gz
+*.tgz
+*.log

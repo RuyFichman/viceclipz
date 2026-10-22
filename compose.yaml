@@ -1,0 +1,14 @@
+services:
+  studio:
+    build: .
+    ports:
+      - "127.0.0.1:4173:4173"
+    environment:
+      NODE_ENV: development
+      APP_ORIGIN: http://127.0.0.1:4173
+    volumes:
+      - viceclipz-data:/app/data
+    restart: unless-stopped
+    stop_grace_period: 10s
+volumes:
+  viceclipz-data:

@@ -1,0 +1,6 @@
+{$BACKEND_HOST} {
+  request_body {
+    max_size 105MB
+  }
+  reverse_proxy studio:4173
+}
