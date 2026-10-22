@@ -45,8 +45,8 @@
   border-bottom: 1px solid #35383b;
 }
 .marketing {
-  background: #101214;
-  color: #f3f4ed;
+  background: #0f0d14;
+  color: #f5f2f7;
   font:
     16px/1.6 system-ui,
     sans-serif;
@@ -76,7 +76,7 @@
   text-decoration: none;
 }
 .marketing .wordmark span {
-  color: #d2ff52;
+  color: #ff4fa3;
 }
 .marketing .hero {
   padding: 80px 0;
@@ -90,17 +90,21 @@
 }
 .marketing h1 em {
   font-style: normal;
-  color: #d2ff52;
+  color: #ff4fa3;
+  background: linear-gradient(100deg, #ff4fa3, #ff7a6b 55%, #ffa94d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .marketing .lead {
   max-width: 620px;
-  color: #c3c7bd;
+  color: #cdbfd3;
   font-size: 22px;
 }
 .marketing .cta {
   display: inline-block;
-  background: #d2ff52;
-  color: #14170e;
+  background: linear-gradient(100deg, #ff4fa3, #ff7a6b 55%, #ffa94d);
+  color: #1e0a28;
   padding: 14px 24px;
   border-radius: 10px;
   font-weight: 750;
@@ -108,7 +112,7 @@
   margin: 16px 12px 16px 0;
 }
 .marketing .eyebrow {
-  color: #d2ff52;
+  color: #c9a7ff;
   font-size: 12px;
   letter-spacing: 0.15em;
 }
@@ -119,10 +123,10 @@
   margin: 40px 0 80px;
 }
 .marketing article {
-  border: 1px solid #383d35;
+  border: 1px solid #3a2a44;
   border-radius: 18px;
   padding: 28px;
-  background: #191d18;
+  background: #1a1320;
 }
 .marketing h2 {
   font-size: 32px;
@@ -133,10 +137,10 @@
 }
 .marketing .number {
   font-size: 42px;
-  color: #d2ff52;
+  color: #ffa94d;
 }
 .marketing details {
-  border-bottom: 1px solid #383d35;
+  border-bottom: 1px solid #3a2a44;
   padding: 20px 0;
 }
 .marketing summary {
@@ -144,12 +148,12 @@
   font-weight: 700;
 }
 .marketing footer {
-  color: #a6afa1;
-  border-top: 1px solid #383d35;
+  color: #b3a3bb;
+  border-top: 1px solid #3a2a44;
 }
 .marketing a:focus-visible,
 .marketing summary:focus-visible {
-  outline: 3px solid #d2ff52;
+  outline: 3px solid #ff4fa3;
   outline-offset: 5px;
 }
 @media (max-width: 760px) {
