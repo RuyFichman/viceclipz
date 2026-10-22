@@ -131,7 +131,7 @@ Use subagents only when explicitly requested by the user or permitted by higher-
 ## UI and accessibility
 
 - Product copy is Brazilian Portuguese unless the user requests otherwise. Keep this agent guide in English. Respond to the user in their chosen language.
-- Preserve the dark visual system, lime accents, existing typography and original ViceClipz branding.
+- Preserve the dark visual system, the Vice-sunset accent palette (pink, orange and violet tokens defined in `dist/styles.css` `:root`), existing typography and original ViceClipz branding. The palette is color inspiration only; do not use third-party logos, artwork or trademarks.
 - Keep navigation usable on small screens and at reduced viewport heights. Do not hide essential actions in inaccessible overflow.
 - Use semantic elements, visible labels, keyboard-accessible controls, visible focus and readable errors. Preserve `hidden`, dialog and form semantics.
 - Provide honest loading, empty, unavailable and error states. Disabled integrations must explain why they are unavailable; do not simulate a successful connection or payment.

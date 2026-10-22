@@ -31,7 +31,7 @@
 }
 .network-icon {
   font-size: 36px;
-  color: #d4fa83;
+  color: var(--accent);
 }
 .launch-list {
   display: grid;
@@ -63,7 +63,7 @@
 #schedule-form select,
 #schedule-form textarea {
   width: 100%;
-  background: #101114;
+  background: var(--bg);
   border: 1px solid #41444c;
   border-radius: 8px;
   color: #eee;
@@ -71,7 +71,7 @@
   font: inherit;
 }
 #schedule-form select option {
-  background: #101114;
+  background: var(--bg);
 }
 #schedule-form .section-heading {
   display: flex;

@@ -15,7 +15,7 @@ Oportunidades: mostrar o produto antes de pedir contratação; permitir revisar 
 ### 1. Fundação e experiência navegável — implementada
 
 - Definição do público inicial: criadores de vídeos curtos, começando por gaming; outros nichos podem usar os mesmos templates.
-- Identidade original ViceClipz: verde-lima, tons escuros, tipografia editorial e composições gráficas próprias.
+- Identidade original ViceClipz: paleta pôr do sol (rosa, laranja e violeta) sobre tons escuros, tipografia editorial e composições gráficas próprias.
 - Visão geral, projetos, templates com filtros, planejamento por data e editor de prévia.
 - Cadastro e edição de rascunhos no armazenamento local do navegador; busca por nome.
 - Vídeo local na prévia, headline, três proporções, três templates e sugestões determinísticas de títulos.

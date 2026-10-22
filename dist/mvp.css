@@ -3,7 +3,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: radial-gradient(ellipse at top, #252c20, #101114 65%);
+  background: radial-gradient(ellipse at top, #2e1638, #0f0d14 65%);
 }
 .account-box {
   width: min(520px, 100%);
@@ -25,7 +25,7 @@
   width: 100%;
   padding: 12px;
   border-radius: 8px;
-  background: #101114;
+  background: var(--bg);
   color: #eee;
   border: 1px solid #41444c;
   font: inherit;
@@ -49,7 +49,7 @@
 #account-result,
 #verification-status {
   overflow-wrap: anywhere;
-  color: #d4fa83;
+  color: var(--accent);
 }
 #verification-email {
   overflow-wrap: anywhere;
@@ -61,7 +61,10 @@
 }
 .auth-story {
   padding: 48px 10%;
-  background: radial-gradient(ellipse at 80% 70%, #354023, #1a2017 70%);
+  background:
+    radial-gradient(ellipse at 80% 75%, #ff7a6b40, transparent 45%),
+    radial-gradient(ellipse at 20% 10%, #8b3fd94d, transparent 55%),
+    #1a1022;
   overflow: hidden;
   position: relative;
 }
@@ -69,7 +72,7 @@
   margin-bottom: 80px;
 }
 .auth-story .brand span {
-  color: var(--lime);
+  color: var(--accent);
 }
 .auth-story h1 {
   font-size: clamp(36px, 4.5vw, 68px);
@@ -78,7 +81,7 @@
   margin-bottom: 24px;
 }
 .auth-story > p {
-  color: #b4bca9;
+  color: #c9b6cf;
   line-height: 1.8;
 }
 .auth-story > small {
@@ -101,7 +104,7 @@
 }
 .auth-art em {
   font-style: normal;
-  color: var(--lime);
+  color: var(--accent);
 }
 .auth-art i {
   display: block;
@@ -112,11 +115,12 @@
   left: 100px;
   background: radial-gradient(
     circle at 30% 30%,
-    #edffbb,
-    #92b749 45%,
-    #24331b 74%
+    #fff1c9,
+    #ffa94d 35%,
+    #ff4fa3 58%,
+    #2a1238 74%
   );
-  box-shadow: 0 0 60px #d4fa8310;
+  box-shadow: 0 0 60px #ff4fa31f;
 }
 .auth-panel {
   display: grid;
@@ -150,7 +154,7 @@
   padding: 14px;
 }
 .text-button {
-  color: var(--lime);
+  color: var(--accent);
   background: transparent;
   margin: 22px 0;
   font-size: 12px;
@@ -223,7 +227,7 @@
 }
 .job-progress {
   height: 5px;
-  background: #343830;
+  background: #352a3d;
   border-radius: 9px;
   overflow: hidden;
   margin-top: 10px;
@@ -231,12 +235,12 @@
 }
 .job-progress i {
   display: block;
-  background: var(--lime);
+  background: var(--sunset);
   height: 100%;
   width: 0;
 }
 .job-meta {
-  color: #9da58e;
+  color: #a898b0;
   font-size: 11px;
 }
 .job-error {
@@ -245,8 +249,8 @@
   margin-top: 8px;
 }
 .download-link {
-  background: var(--lime);
-  color: #1c2611;
+  background: var(--sunset);
+  color: var(--ink);
   padding: 11px 14px;
   border-radius: 6px;
   font-size: 11px;
@@ -260,7 +264,7 @@
 .check-label input {
   width: auto;
   margin: 0;
-  accent-color: var(--lime);
+  accent-color: var(--accent);
 }
 .preview-column {
   align-self: start;
@@ -308,7 +312,7 @@
   padding-top: 15px;
   margin-top: 20px;
   font-size: 9px;
-  color: #a6b299;
+  color: #b9a6c2;
 }
 .dialog-footer {
   position: sticky;
@@ -367,7 +371,7 @@ select:disabled {
   border-radius: 7px;
 }
 .job-status.done {
-  color: var(--lime);
+  color: var(--accent);
 }
 @media (max-width: 800px) {
   .auth-screen {
