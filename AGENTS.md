@@ -16,7 +16,9 @@ The application currently includes:
 
 - Account registration/login and private, user-owned assets and projects.
 - Email verification and password recovery with hashed single-use tokens and an encrypted Resend outbox.
-- Video upload, trimming, framing, headline composition, and FFmpeg exports.
+- Video and image upload (PNG/JPEG/WebP, validated by content and re-encoded without metadata) and the classic headline editor for existing projects.
+- A seven-step template builder (Post card, Meme, Vídeo viral) with profile card, media zones and presets, phrases, typography, saved profiles/styles and batch variations rendered as real MP4 files. See `docs/TEMPLATES.md`.
+- Optional automatic phrase suggestions through a backend-only Anthropic provider adapter, disabled honestly when not configured.
 - Instagram-first social integration, with an optional YouTube adapter.
 - Persistent publication scheduling and explicit handling of ambiguous sends.
 - Stripe Checkout, Customer Portal, signed webhooks, and subscription quotas.
@@ -43,7 +45,19 @@ Implementation is not evidence of external activation. Do not claim that OAuth a
 | `tests/discovery.test.mjs` | Collector safety, parsers, adapters, ownership, quotas and metrics |
 | `lib/api.mjs` | Authenticated asset/project/export API, ownership checks and quotas |
 | `lib/composition.mjs` | Project validation, format definitions and canvas overlays |
-| `lib/media.mjs` | FFmpeg/ffprobe paths and source-media probing |
+| `lib/media.mjs` | FFmpeg/ffprobe paths, rotation-aware video probing and image probing |
+| `lib/images.mjs` | Image signature detection, bounded decode and metadata-free re-encoding |
+| `lib/template-spec.mjs` | Template/profile/style validation, variation building and asset references |
+| `lib/template-render.mjs` | Bundled fonts, card/band layout and PNG, per-variation FFmpeg filtergraph |
+| `lib/template-api.mjs` | Template preview, saved profiles/styles, batches, ETA and ZIP routes |
+| `lib/queue.mjs` | Fair queue order, active-operation count, storage reservations and ETA |
+| `lib/archive.mjs` | Streamed, uncompressed ZIP of finished variations |
+| `lib/phrase-ai.mjs` | Phrase-suggestion provider adapter, output validation and monthly limits |
+| `dist/template-core.js` | Shared browser/Node limits, presets, defaults and zoom/pan placement math |
+| `dist/templates.js`, `dist/templates.css` | Template gallery, seven-step builder, live preview and batch grid |
+| `fonts/` | SIL OFL fonts used only by the server renderer, with their licenses |
+| `tests/templates.test.mjs` | Schema upgrade, template validation, geometry, batch quotas, saved presets and mocked AI |
+| `tests/template-render.test.mjs` | Real image uploads and MP4 renders of every preset, batches, quotas and ZIP (port 4188) |
 | `lib/launch-store.mjs` | Social/billing schema, entitlements, usage ledger and encryption |
 | `lib/launch-api.mjs` | Social callbacks, signed media, scheduling and billing endpoints |
 | `lib/social.mjs` | Provider OAuth, token refresh and publishing adapters |
@@ -88,7 +102,9 @@ Run these from the repository root:
 | `npm run dev` | Start local API/UI and supervised workers |
 | `npm start` | Start the same server entry point |
 | `npm run check` | Syntax-check the entry points listed in package.json |
-| `npm test` | Run the four test files sequentially with Node's test runner |
+| `npm test` | Run the six test files sequentially with Node's test runner |
+| `node --test tests/templates.test.mjs` | Run focused template, batch-quota and phrase-adapter tests |
+| `node --test tests/template-render.test.mjs` | Render every template preset with real FFmpeg and check batches and ZIP |
 | `node --test tests/account.test.mjs` | Run focused account security and email tests |
 | `node --test tests/launch.test.mjs` | Run focused launch/integration logic tests |
 | `node --test tests/integration.test.mjs` | Run API and actual media-rendering regression tests |
@@ -163,8 +179,11 @@ Use subagents only when explicitly requested by the user or permitted by higher-
 - Test upgrades against a disposable copy of representative existing data. Production migration and backup requirements must be documented.
 - Keep one server instance per DATA_DIR. Do not remove a live `server.lock` or launch multiple replicas against the same database.
 - Preserve optimistic project revision checks and export deduplication. Do not silently overwrite edits from another browser tab.
-- Current media limits are defined in `lib/config.mjs`: 100 MiB upload, 10-minute source, 120-second export, two active exports per account enforced in the API. Formats are 720×1280, 720×720 and 720×900.
-- Keep editor preview and export composition aligned. Probe input and validate generated MP4s rather than treating a subprocess exit code alone as success.
+- Current media limits are defined in `lib/config.mjs`: 100 MiB upload, 10-minute source, 120-second export. Formats are 720×1280, 720×720 and 720×900; templates export 720×1280 only. Template limits (zones, options, phrases, 50 variations per batch) live in `dist/template-core.js` and are enforced again on the server.
+- At most two active operations per account: a single export or a whole batch each count as one. Every batch item reserves one monthly export in the usage ledger and a bitrate-bounded storage reservation; failures and cancellations release, retries re-reserve the same job without double counting.
+- One global worker renders sequentially; the queue interleaves accounts. Keep it sequential for the 1-vCPU VPS and keep `-threads 2`, timeouts, cancellation cleanup and MP4 validation for every render path.
+- Images are accepted only after signature, ffprobe and full decode checks, are re-encoded without metadata (EXIF orientation applied) and are stored with their kind in `asset_kinds`. Keep `assets` columns unchanged: the previous release inserts into it positionally and must keep working after a rollback.
+- Keep editor preview and export composition aligned: the server renders the card PNG and returns the geometry the preview uses, and `placement()` in `dist/template-core.js` drives both the preview and the FFmpeg crop. Probe input and validate generated MP4s rather than treating a subprocess exit code alone as success.
 - Preserve HTTP range support for media and authenticated private downloads. Signed social media links must remain narrowly scoped and short-lived.
 - Do not delete media referenced by active processing or publication records. Preserve the API's explicit deletion constraints.
 - Never delete private data merely to pass tests or recover disk space without authorization.
@@ -213,7 +232,8 @@ Use `.env.example` as the configuration inventory. Important groups:
 | `INSTAGRAM_CLIENT_ID`, `INSTAGRAM_CLIENT_SECRET`, `META_API_VERSION` | Instagram app configuration |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional YouTube OAuth configuration |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CREATOR_PRICE_ID`, `STRIPE_STUDIO_PRICE_ID` | Billing configuration |
-| `FFMPEG_PATH`, `FFPROBE_PATH`, `FONT_PATH` | Optional runtime binary/font overrides |
+| `FFMPEG_PATH`, `FFPROBE_PATH`, `FONT_PATH` | Optional runtime binary/font overrides (`FONT_PATH` affects only the classic editor; templates use `fonts/`) |
+| `ANTHROPIC_API_KEY`, `PHRASE_AI_MODEL`, `PHRASE_AI_MONTHLY_LIMIT` | Optional backend-only phrase suggestions; without a key the feature reports itself unavailable |
 
 Never commit `.env`, real tokens, keys, private databases, backups, media, logs, or test-account sessions. Keep `.gitignore`, `.dockerignore`, `.vercelignore`, and the static build allowlist consistent when adding artifact locations. Do not paste secrets into chat or command arguments. Request configuration through the appropriate secret-management mechanism rather than asking the user to disclose keys in a message.
 
@@ -233,7 +253,7 @@ Use behavior-oriented tests rather than tests that merely duplicate implementati
 | Deployment | Build output contents, proxy/origin configuration and Compose validation |
 | Backup/restore | Integrity, media preservation, corruption rejection and no overwrite |
 
-The test runner uses isolated `.test-data-*` directories and synthetic media. Media integration tests currently use port 4187; inspect the tests before assigning other QA ports. Do not run conflicting test instances concurrently or point tests at real DATA_DIR. Some tests initialize configuration at module import time; set test environment variables before importing the database/configuration modules.
+The test runner uses isolated `.test-data-*` directories and synthetic media. Media integration tests use port 4187 and template render tests use port 4188; inspect the tests before assigning other QA ports. Never call the live AI provider from tests: inject a provider with `setPhraseProvider` or a fake client into `anthropicProvider`. Do not run conflicting test instances concurrently or point tests at real DATA_DIR. Some tests initialize configuration at module import time; set test environment variables before importing the database/configuration modules.
 
 Keep real provider access mocked in the default suite. Preserve evidence under ignored `test-results/` when helpful. Distinguish syntax checks, local tests, simulated-provider tests, browser inspection and live external validation in the final report.
 
@@ -277,6 +297,8 @@ On Windows, inspect the exact port/process and command before restarting a serve
 ## Known launch gaps and definition of done
 
 A public product presentation is now implemented at `/sobre`. Commercial prices/terms, legal pages and a real public product demonstration remain launch follow-ups. Reference collection and studio metrics are locally tested; external provider validation is still required.
+
+Template batches are locally tested with real FFmpeg renders; batch render times on the production VPS and phrase suggestions against the live provider are not yet validated. Phrase suggestions must stay grounded in the user's description: keep the no-invented-facts prompt, strict output validation, per-account limits, and never log descriptions, outputs or keys.
 
 Email verification and password recovery are implemented and locally tested, but real delivery still requires a verified sender/domain, credentials and inbox validation. Public legal/commercial pages, support details, provider approvals, live credentials, monitoring, external backups, infrastructure recovery and real end-to-end provider tests require completion before general public launch. Do not silently remove the invitation-only beta restriction to bypass these gaps.
 

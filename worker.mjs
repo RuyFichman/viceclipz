@@ -4,8 +4,16 @@ import path from "node:path";
 import { one, run, all } from "./lib/db.mjs";
 import { DATA, assetPath, outputPath, EXPORT_RESERVE } from "./lib/config.mjs";
 import { overlay, formats } from "./lib/composition.mjs";
-import { FFMPEG, probe } from "./lib/media.mjs";
+import { FFMPEG, probe, probeImage } from "./lib/media.mjs";
 import { releaseRender } from "./lib/launch-store.mjs";
+import {
+  renderOverlay,
+  variationArgs,
+  loadAvatar,
+} from "./lib/template-render.mjs";
+import { CANVAS } from "./dist/template-core.js";
+import { nextJob } from "./lib/queue.mjs";
+import { fileCrc } from "./lib/archive.mjs";
 let busy = false,
   child = null,
   stopping = false;
@@ -27,70 +35,100 @@ for (const job of all(
   "SELECT id FROM jobs WHERE state IN ('failed','cancelled','queued')",
 ))
   await unlink(outputPath(job.id)).catch(() => {});
+async function legacyCommand(spec, image, output) {
+  const [w, h] = formats[spec.format],
+    duration = spec.end - spec.start;
+  await writeFile(image, overlay(spec));
+  const sizing =
+    spec.fit === "cover"
+      ? `scale=${w}:${h}:force_original_aspect_ratio=increase,crop=${w}:${h}`
+      : `scale=${w}:${h}:force_original_aspect_ratio=decrease,pad=${w}:${h}:(ow-iw)/2:(oh-ih)/2:color=black`;
+  const args = [
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-nostdin",
+    "-y",
+    "-protocol_whitelist",
+    "file,pipe",
+    "-ss",
+    String(spec.start),
+    "-i",
+    assetPath(spec.assetId),
+    "-loop",
+    "1",
+    "-i",
+    image,
+    "-filter_complex",
+    `[0:v:0]${sizing},setsar=1,fps=30[base];[base][1:v:0]overlay=0:0:shortest=1,format=yuv420p[v]`,
+    "-map",
+    "[v]",
+  ];
+  if (!spec.mute)
+    args.push("-map", "0:a:0?", "-c:a", "aac", "-b:a", "128k", "-af", "apad");
+  else args.push("-an");
+  args.push(
+    "-t",
+    String(duration),
+    "-c:v",
+    "libx264",
+    "-preset",
+    "veryfast",
+    "-crf",
+    "23",
+    "-maxrate",
+    "4M",
+    "-bufsize",
+    "8M",
+    "-threads",
+    "2",
+    "-filter_complex_threads",
+    "1",
+    "-movflags",
+    "+faststart",
+    "-progress",
+    "pipe:1",
+    output,
+  );
+  return { args, duration, width: w, height: h, timeout: duration * 12000 };
+}
+// Template variations: sizes are probed again because stored metadata of older uploads
+// may predate rotation handling, and the crop math needs the upright size.
+async function variationCommand(spec, image, output) {
+  const sources = {};
+  for (const [slotId, cell] of Object.entries(spec.cells)) {
+    const file = assetPath(cell.assetId),
+      info = cell.type === "video" ? await probe(file) : await probeImage(file);
+    sources[slotId] = { path: file, width: info.width, height: info.height };
+  }
+  const avatar = spec.profile.avatar
+      ? await loadAvatar(spec.profile.avatarAssetId)
+      : null,
+    { image: png, layout } = renderOverlay(spec, spec.phrase, avatar);
+  await writeFile(image, png);
+  return {
+    args: variationArgs({ spec, layout, sources, overlay: image, output }),
+    duration: spec.duration,
+    width: CANVAS.width,
+    height: CANVAS.height,
+    timeout: spec.duration * 15000,
+  };
+}
 async function renderJob(job) {
   const spec = JSON.parse(job.snapshot),
-    [w, h] = formats[spec.format],
-    duration = spec.end - spec.start;
-  const image = path.join(DATA, "temp", job.id + ".png"),
+    image = path.join(DATA, "temp", job.id + ".png"),
     output = outputPath(job.id);
   let timeout = false,
     cancelled = false,
     stderr = "";
   try {
-    await writeFile(image, overlay(spec));
-    const sizing =
-      spec.fit === "cover"
-        ? `scale=${w}:${h}:force_original_aspect_ratio=increase,crop=${w}:${h}`
-        : `scale=${w}:${h}:force_original_aspect_ratio=decrease,pad=${w}:${h}:(ow-iw)/2:(oh-ih)/2:color=black`;
-    const args = [
-      "-hide_banner",
-      "-loglevel",
-      "error",
-      "-nostdin",
-      "-y",
-      "-protocol_whitelist",
-      "file,pipe",
-      "-ss",
-      String(spec.start),
-      "-i",
-      assetPath(spec.assetId),
-      "-loop",
-      "1",
-      "-i",
-      image,
-      "-filter_complex",
-      `[0:v:0]${sizing},setsar=1,fps=30[base];[base][1:v:0]overlay=0:0:shortest=1,format=yuv420p[v]`,
-      "-map",
-      "[v]",
-    ];
-    if (!spec.mute)
-      args.push("-map", "0:a:0?", "-c:a", "aac", "-b:a", "128k", "-af", "apad");
-    else args.push("-an");
-    args.push(
-      "-t",
-      String(duration),
-      "-c:v",
-      "libx264",
-      "-preset",
-      "veryfast",
-      "-crf",
-      "23",
-      "-maxrate",
-      "4M",
-      "-bufsize",
-      "8M",
-      "-threads",
-      "2",
-      "-filter_complex_threads",
-      "1",
-      "-movflags",
-      "+faststart",
-      "-progress",
-      "pipe:1",
-      output,
-    );
+    const command =
+        spec.kind === "variation"
+          ? await variationCommand(spec, image, output)
+          : await legacyCommand(spec, image, output),
+      { duration, width: w, height: h } = command;
     await new Promise((resolve, reject) => {
-      child = spawn(FFMPEG, args, {
+      child = spawn(FFMPEG, command.args, {
         windowsHide: true,
         stdio: ["ignore", "pipe", "pipe"],
       });
@@ -100,7 +138,7 @@ async function renderJob(job) {
           timeout = true;
           child?.kill();
         },
-        Math.max(90000, duration * 12000),
+        Math.max(90000, command.timeout),
       );
       const check = setInterval(() => {
         if (
@@ -155,12 +193,13 @@ async function renderJob(job) {
       result.width !== w ||
       result.height !== h ||
       result.codec !== "h264" ||
-      size > EXPORT_RESERVE
+      size > (job.reserve ?? EXPORT_RESERVE)
     )
       throw new Error("A validação do MP4 falhou.");
     const changed = run(
-      "UPDATE jobs SET state='done',progress=100,size=?,error=NULL,updated=? WHERE id=? AND state='running'",
+      "UPDATE jobs SET state='done',progress=100,size=?,crc=?,error=NULL,updated=? WHERE id=? AND state='running'",
       size,
+      await fileCrc(output),
       Date.now(),
       job.id,
     ).changes;
@@ -193,15 +232,15 @@ async function renderJob(job) {
 }
 async function tick() {
   if (busy || stopping) return;
-  const job = one(
-    "SELECT * FROM jobs WHERE state='queued' ORDER BY created LIMIT 1",
-  );
+  const job = nextJob();
   if (!job) return;
-  const claimed = run(
-    "UPDATE jobs SET state='running',progress=0,attempts=attempts+1,updated=? WHERE id=? AND state='queued'",
-    Date.now(),
-    job.id,
-  );
+  const now = Date.now(),
+    claimed = run(
+      "UPDATE jobs SET state='running',progress=0,attempts=attempts+1,started=?,updated=? WHERE id=? AND state='queued'",
+      now,
+      now,
+      job.id,
+    );
   if (!claimed.changes) return;
   busy = true;
   try {

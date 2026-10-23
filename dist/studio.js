@@ -1,11 +1,13 @@
 import { openSchedule, setLaunchSession } from "./launch.js";
 import { setDiscoverySession } from "./discovery.js";
+import { setTemplateSession, useAssetInTemplate } from "./templates.js";
 import {
   accountHandlers,
   hideVerification,
   showVerification,
 } from "./account.js";
 const $ = (s) => document.querySelector(s);
+// Themes of the classic headline editor, kept for projects created before templates.
 const templates = [
   {
     id: "neon",
@@ -37,11 +39,17 @@ const dimensions = {
   "1:1": [720, 720],
   "4:5": [720, 900],
 };
+const templateLabels = {
+  post: "Post card",
+  meme: "Meme",
+  viral: "Vídeo viral",
+};
 const labels = {
   overview: "Visão geral",
   projects: "Meus projetos",
   templates: "Templates",
-  library: "Meus vídeos",
+  builder: "Editor de template",
+  library: "Biblioteca",
   exports: "Exportações",
   calendar: "Calendário",
   integrations: "Contas conectadas",
@@ -93,6 +101,7 @@ function showAuth() {
   hideVerification();
   setLaunchSession(false);
   setDiscoverySession(false);
+  setTemplateSession(null);
   user = null;
   projects = [];
   assets = [];
@@ -112,6 +121,7 @@ async function load() {
     user = null;
     setLaunchSession(false);
     setDiscoverySession(false);
+    setTemplateSession(null);
     showVerification(session);
     return;
   }
@@ -135,6 +145,7 @@ async function load() {
   setGlobalError();
   setLaunchSession(true);
   setDiscoverySession(true);
+  setTemplateSession(user);
 }
 function storage(session) {
   $("#storage-label").textContent =
@@ -143,34 +154,18 @@ function storage(session) {
     Math.min(100, (session.usage / session.storageLimit) * 100) + "%";
 }
 function route() {
-  const page = Object.hasOwn(labels, location.hash.slice(1))
-    ? location.hash.slice(1)
-    : "overview";
+  const hash = location.hash.slice(1).split("/")[0],
+    page = Object.hasOwn(labels, hash) ? hash : "overview";
   document
     .querySelectorAll(".page")
     .forEach((el) => (el.hidden = el.id !== page));
+  const nav = page === "builder" ? "templates" : page;
   document.querySelectorAll("[data-nav]").forEach((el) => {
-    el.classList.toggle("active", el.dataset.nav === page);
-    if (el.dataset.nav === page) el.setAttribute("aria-current", "page");
+    el.classList.toggle("active", el.dataset.nav === nav);
+    if (el.dataset.nav === nav) el.setAttribute("aria-current", "page");
     else el.removeAttribute("aria-current");
   });
   $("#breadcrumb").textContent = labels[page];
-}
-function templateCard(t) {
-  const el = document.createElement("button");
-  el.className = "template-card";
-  el.setAttribute("aria-label", `Usar template ${t.name}`);
-  el.innerHTML = `<div class="template-art ${t.id}"><span>${t.tag}</span><i></i><strong>${t.headline}</strong></div><div class="template-info"><div><h3>${t.name}</h3><small>${t.description}</small></div><span>${t.format}</span></div>`;
-  el.onclick = () => openEditor(null, t.id);
-  return el;
-}
-function renderTemplates(filter = "all") {
-  $("#featured-templates").replaceChildren(...templates.map(templateCard));
-  $("#all-templates").replaceChildren(
-    ...templates
-      .filter((t) => filter === "all" || t.format === filter)
-      .map(templateCard),
-  );
 }
 function empty(el, title, copy) {
   el.innerHTML = '<div class="empty simple"><h3></h3><p></p></div>';
@@ -218,20 +213,29 @@ function projectList(target, list) {
     return;
   }
   for (const p of list) {
-    const el = document.createElement("article");
+    const el = document.createElement("article"),
+      template = p.kind === "template";
     el.className = "project-row";
-    el.innerHTML = `<span class="project-icon ${p.template}">▹</span><div><h3></h3><small></small></div><span class="draft">Projeto salvo</span><div class="actions"></div>`;
+    el.innerHTML = `<span class="project-icon ${template ? "neon" : p.template}">${template ? "▦" : "▹"}</span><div><h3></h3><small></small></div><span class="draft"></span><div class="actions"></div>`;
     el.querySelector("h3").textContent = p.name;
-    el.querySelector("small").textContent =
-      `${p.format} · ${p.assetId ? (p.end - p.start).toFixed(1) + " s" : "Sem vídeo"}${p.date ? " · Planejado: " + new Date(p.date + "T12:00:00").toLocaleDateString("pt-BR") : ""}`;
+    el.querySelector(".draft").textContent = template
+      ? "Template"
+      : "Projeto clássico";
+    el.querySelector("small").textContent = template
+      ? `${templateLabels[p.layout] || "Template"} · 9:16 · ${p.zones.length} ${p.zones.length === 1 ? "zona" : "zonas"} · ${p.phrases.length} ${p.phrases.length === 1 ? "frase" : "frases"}`
+      : `${p.format} · ${p.assetId ? (p.end - p.start).toFixed(1) + " s" : "Sem vídeo"}${p.date ? " · Planejado: " + new Date(p.date + "T12:00:00").toLocaleDateString("pt-BR") : ""}`;
     el.querySelector(".actions").append(
-      button("Editar ↗", () => openEditor(p)),
+      button("Editar ↗", () =>
+        template ? (location.hash = "builder/" + p.id) : openEditor(p),
+      ),
       button(
         "Remover",
         async () => {
           if (
             await confirmRemove(
-              "O projeto e suas exportações serão removidos. O vídeo original continuará na biblioteca.",
+              template
+                ? "O template, seus lotes e as variações geradas serão removidos. Os arquivos continuarão na biblioteca."
+                : "O projeto e suas exportações serão removidos. O vídeo original continuará na biblioteca.",
             )
           ) {
             await request("/projects/" + p.id, { method: "DELETE" });
@@ -250,31 +254,31 @@ function renderAssets() {
   if (!assets.length) {
     empty(
       target,
-      "Seu primeiro vídeo começa aqui.",
-      "Envie um MP4, MOV ou WebM para usar nos seus projetos.",
+      "Seu primeiro arquivo começa aqui.",
+      "Envie vídeos MP4, MOV ou WebM e imagens PNG, JPEG ou WebP para usar nos seus templates.",
     );
     return;
   }
   for (const a of assets) {
-    const el = document.createElement("article");
+    const el = document.createElement("article"),
+      image = a.kind === "image";
     el.className = "project-row";
-    el.innerHTML =
-      '<span class="project-icon neon">▶</span><div><h3></h3><small></small></div><div class="actions"></div>';
+    el.innerHTML = image
+      ? '<img class="asset-preview" alt="" loading="lazy" /><div><h3></h3><small></small></div><div class="actions"></div>'
+      : '<span class="project-icon neon">▶</span><div><h3></h3><small></small></div><div class="actions"></div>';
+    if (image) el.querySelector("img").src = "/api/assets/" + a.id + "/content";
     el.querySelector("h3").textContent = a.name;
-    el.querySelector("small").textContent =
-      `${a.duration.toFixed(1)} s · ${a.width} × ${a.height} · ${bytes(a.size)}`;
+    el.querySelector("small").textContent = image
+      ? `Imagem · ${a.width} × ${a.height} · ${bytes(a.size)}`
+      : `${a.duration.toFixed(1)} s · ${a.width} × ${a.height} · ${bytes(a.size)}`;
     el.querySelector(".actions").append(
-      button("Criar projeto ↗", () => {
-        openEditor();
-        $("#asset-select").value = a.id;
-        selectAsset();
-      }),
+      button("Usar em template ↗", () => useAssetInTemplate(a)),
       button(
         "Remover",
         async () => {
           if (
             await confirmRemove(
-              "O vídeo original será removido do servidor. Vídeos em uso por projetos não podem ser removidos.",
+              "O arquivo original será removido do servidor. Arquivos em uso por projetos ou templates não podem ser removidos.",
             )
           ) {
             await request("/assets/" + a.id, { method: "DELETE" });
@@ -393,9 +397,10 @@ function render() {
   renderJobs();
   stats();
 }
-window.addEventListener("viceclipz:projects-changed", () => {
-  if (user) refresh().catch((error) => toast(error.message));
-});
+for (const event of ["viceclipz:projects-changed", "viceclipz:assets-changed"])
+  window.addEventListener(event, () => {
+    if (user) refresh().catch((error) => toast(error.message));
+  });
 async function refresh() {
   const [p, a, j, s] = await Promise.all([
     request("/projects"),
@@ -430,7 +435,8 @@ async function poll() {
 function fillAssets() {
   const select = $("#asset-select");
   select.replaceChildren(new Option("Selecione um vídeo", ""));
-  for (const a of assets) select.append(new Option(a.name, a.id));
+  for (const a of assets)
+    if (a.kind !== "image") select.append(new Option(a.name, a.id));
 }
 function clearPreview() {
   previewSequence++;
@@ -561,8 +567,12 @@ function upload(file, onProgress) {
       reject(new Error("Escolha um vídeo de até 100 MB."));
       return;
     }
-    if (!/\.(mp4|mov|webm)$/i.test(file.name)) {
-      reject(new Error("Escolha um arquivo MP4, MOV ou WebM."));
+    if (!/\.(mp4|mov|webm|png|jpe?g|webp)$/i.test(file.name)) {
+      reject(
+        new Error(
+          "Escolha um vídeo MP4, MOV ou WebM ou uma imagem PNG, JPEG ou WebP.",
+        ),
+      );
       return;
     }
     const xhr = new XMLHttpRequest();
@@ -602,10 +612,17 @@ async function uploadFile(file, status, intoEditor = false) {
       file,
       (n) =>
         (status.textContent =
-          n === 100 ? "Verificando vídeo…" : `Enviando vídeo… ${n}%`),
+          n === 100 ? "Verificando arquivo…" : `Enviando arquivo… ${n}%`),
     );
+    if (intoEditor && a.kind === "image")
+      throw new Error(
+        "Projetos clássicos usam vídeos. A imagem foi salva na biblioteca.",
+      );
     assets.unshift(a);
-    status.textContent = "Vídeo enviado e verificado.";
+    status.textContent =
+      a.kind === "image"
+        ? "Imagem enviada e verificada."
+        : "Vídeo enviado e verificado.";
     if (intoEditor) {
       fillAssets();
       $("#asset-select").value = a.id;
@@ -614,7 +631,7 @@ async function uploadFile(file, status, intoEditor = false) {
     renderAssets();
     stats();
     storage(await request("/auth/me"));
-    toast("Vídeo salvo na sua biblioteca.");
+    toast("Arquivo salvo na sua biblioteca.");
   } catch (e) {
     status.textContent = e.message;
   } finally {
@@ -709,7 +726,7 @@ for (const t of templates)
   $("#template-select").append(new Option(t.name, t.id));
 document
   .querySelectorAll(".new-project")
-  .forEach((b) => (b.onclick = () => openEditor()));
+  .forEach((b) => (b.onclick = () => (location.hash = "templates")));
 $("#close-editor").onclick = () => {
   if (!busy) $("#editor").close();
 };
@@ -788,18 +805,7 @@ $("#video-preview").onerror = () => {
     $("#preview-status").textContent =
       "Prévia indisponível para este codec. A exportação MP4 pode converter o vídeo.";
 };
-document.querySelectorAll("[data-filter]").forEach(
-  (b) =>
-    (b.onclick = () => {
-      document.querySelectorAll("[data-filter]").forEach((el) => {
-        el.classList.toggle("active", el === b);
-        el.setAttribute("aria-pressed", String(el === b));
-      });
-      renderTemplates(b.dataset.filter);
-    }),
-);
 window.addEventListener("hashchange", route);
-renderTemplates();
 accountHandlers({
   signedOut: showAuth,
   reload: () => load().catch(() => showAuth()),

@@ -26,13 +26,13 @@ O servidor e o worker devem permanecer em execução durante a exportação. Fec
 
 | Recurso | Limite |
 | --- | --- |
-| Upload | 100 MiB por arquivo, vídeo de até 10 minutos |
+| Upload | 100 MiB por arquivo, vídeo de até 10 minutos; imagens PNG, JPEG e WebP para templates (ver `TEMPLATES.md`) |
 | Resolução de entrada | Até 4096 × 4096 |
 | Espaço por conta | 2 GiB, incluindo originais e MP4 gerados |
 | Corte/exportação | 0,25 a 120 segundos |
 | Saídas | 720 × 1280, 720 × 720, 720 × 900 |
 | Codec | H.264/yuv420p, 30 fps; AAC 128 kbps quando há áudio |
-| Fila | Dois jobs ativos por conta; um worker global |
+| Fila | Duas operações ativas por conta (exportação avulsa ou lote inteiro); um worker global |
 | Tentativas | Até três execuções por job; nenhuma cobrança |
 
 Cada job ativo reserva 100 MiB na cota. Apenas o tamanho real é contabilizado após sucesso. Jobs cancelados/falhos não contam como exportações concluídas. Pedir novamente a mesma composição reutiliza o job/MP4 existente. Alterar o projeto cria um novo snapshot; exportações anteriores ficam preservadas até serem removidas.

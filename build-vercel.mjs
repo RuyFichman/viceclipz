@@ -59,6 +59,9 @@ export async function build(destination, backend) {
     "discovery.js",
     "growth.css",
     "landing.html",
+    "templates.js",
+    "template-core.js",
+    "templates.css",
   ])
     await copyFile(
       path.join(root, "dist", file),
