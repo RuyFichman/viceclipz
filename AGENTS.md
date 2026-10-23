@@ -62,6 +62,7 @@ Implementation is not evidence of external activation. Do not claim that OAuth a
 | `Dockerfile`, `compose.yaml` | Persistent backend image and local container configuration |
 | `compose.production.yaml`, `Caddyfile` | Production backend, persistent volumes and HTTPS proxy |
 | `compose.vps.yaml` | Single-VPS backend behind an existing reverse proxy network, no published ports |
+| `deploy-vps.mjs` | Uploads the committed HEAD to a VPS, rebuilds, swaps releases, waits for health; `--rollback` restores the previous release |
 | `backup.mjs` | Offline, integrity-checked backup and restore to a new directory |
 | `.env.example` | Configuration names and non-secret examples |
 | `docs/` | Product plan, MVP behavior, deployment and validation records |
@@ -95,6 +96,7 @@ Run these from the repository root:
 | `npm run build:vercel` | Build the public Vercel output; requires BACKEND_ORIGIN |
 | `docker compose up -d --build` | Start the local container configuration |
 | `docker compose -f compose.production.yaml up -d --build` | Deploy the configured persistent backend |
+| `npm run deploy:vps -- user@host --key PATH` | Deploy the committed HEAD to the shared VPS (`compose.vps.yaml`); add `--rollback` to restore the previous release |
 | `git diff --check` | Check tracked changes for whitespace errors |
 
 `npm run check` does not discover every new JavaScript file. Run `node --check <file>` for additional entry points and update the script when appropriate. Format changed files directly if the full formatter would introduce unrelated changes. `backup.mjs` is not currently included in the formatter's file list.
