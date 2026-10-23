@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/mvp.css" />
     <link rel="stylesheet" href="/launch.css" />
     <link rel="stylesheet" href="/growth.css" />
+    <link rel="stylesheet" href="/templates.css" />
     <script type="module" src="/studio.js"></script>
   </head>
   <body>
@@ -96,7 +97,7 @@
           ><a href="#projects" data-nav="projects"
             ><span>▱</span>Meus projetos <b id="project-count">0</b></a
           ><a href="#templates" data-nav="templates"><span>▦</span>Templates</a
-          ><a href="#library" data-nav="library"><span>▣</span>Meus vídeos</a
+          ><a href="#library" data-nav="library"><span>▣</span>Biblioteca</a
           ><a href="#exports" data-nav="exports"
             ><span>↓</span>Exportações <b id="job-count">0</b></a
           ><a href="#calendar" data-nav="calendar"><span>▤</span>Calendário</a>
@@ -230,37 +231,581 @@
             <div class="heading">
               <div>
                 <p class="eyebrow">ENCONTRE SUA LINGUAGEM</p>
-                <h1>Comece com um template<span>.</span></h1>
-                <p>Três identidades. Todos os formatos. A sua história.</p>
+                <h1>Escolha um template<span>.</span></h1>
+                <p>
+                  Vídeos verticais 9:16 com cartão de perfil, frases e quantas
+                  variações você precisar.
+                </p>
               </div>
             </div>
-            <div class="filters" aria-label="Filtrar templates">
-              <button class="active" data-filter="all" aria-pressed="true">
-                Todos</button
-              ><button data-filter="9:16" aria-pressed="false">
-                Vertical · 9:16</button
-              ><button data-filter="1:1" aria-pressed="false">
-                Quadrado · 1:1</button
-              ><button data-filter="4:5" aria-pressed="false">
-                Retrato · 4:5
-              </button>
-            </div>
+            <p id="gallery-status" class="field-help" role="status"></p>
             <div class="template-grid" id="all-templates"></div>
+          </section>
+          <section id="builder" class="page" hidden>
+            <div class="builder-head">
+              <a href="#templates" class="secondary">← Templates</a>
+              <label class="builder-name"
+                ><span>Nome do template</span
+                ><input id="builder-name" maxlength="80" required
+              /></label>
+              <p id="builder-status" class="builder-status" role="status"></p>
+            </div>
+            <nav class="stepbar" aria-label="Etapas do template">
+              <ol id="builder-steps"></ol>
+            </nav>
+            <p id="step-lock" class="step-lock" role="status"></p>
+            <div id="builder-empty" class="empty simple" hidden>
+              <h3>Template não encontrado.</h3>
+              <p>Escolha um template na galeria para começar.</p>
+            </div>
+            <div class="builder-grid" id="builder-body">
+              <form id="builder-form" class="builder-panel" novalidate>
+                <fieldset data-step="profile" class="step">
+                  <legend class="step-title">Perfil</legend>
+                  <p class="step-copy">
+                    O cartão que acompanha a frase. Tudo é desenhado no próprio
+                    MP4.
+                  </p>
+                  <div class="toggle-grid">
+                    <label class="switch"
+                      ><input type="checkbox" data-bind="profile.avatar" />
+                      Avatar</label
+                    ><label class="switch"
+                      ><input type="checkbox" data-bind="profile.verified" />
+                      Selo de verificado</label
+                    ><label class="switch"
+                      ><input type="checkbox" data-bind="profile.showName" />
+                      Nome</label
+                    ><label class="switch"
+                      ><input type="checkbox" data-bind="profile.showHandle" />
+                      @ do perfil</label
+                    >
+                  </div>
+                  <div class="avatar-row">
+                    <img
+                      id="pf-avatar-img"
+                      class="avatar-thumb"
+                      alt=""
+                      hidden
+                    />
+                    <span id="pf-avatar-empty" class="avatar-thumb empty-thumb"
+                      >sem foto</span
+                    >
+                    <label class="secondary upload-label"
+                      >Enviar avatar<input
+                        type="file"
+                        id="pf-avatar-file"
+                        class="visually-hidden"
+                        accept="image/png,image/jpeg,image/webp"
+                    /></label>
+                    <label class="inline-select"
+                      >Ou da biblioteca<select id="pf-avatar-select"></select
+                    ></label>
+                  </div>
+                  <p id="pf-avatar-status" class="field-help" role="status"></p>
+                  <div class="field-row">
+                    <label
+                      >Nome exibido<input
+                        data-bind="profile.name"
+                        maxlength="50"
+                        autocomplete="off" /></label
+                    ><label
+                      >@ do perfil<input
+                        data-bind="profile.handle"
+                        maxlength="31"
+                        autocomplete="off"
+                        placeholder="seuperfil"
+                    /></label>
+                  </div>
+                  <fieldset class="segmented">
+                    <legend>Alinhamento do texto</legend>
+                    <label
+                      ><input
+                        type="radio"
+                        name="pf-align"
+                        value="left"
+                        data-bind="profile.align"
+                      /><span>Esquerda</span></label
+                    ><label
+                      ><input
+                        type="radio"
+                        name="pf-align"
+                        value="center"
+                        data-bind="profile.align"
+                      /><span>Centro</span></label
+                    ><label
+                      ><input
+                        type="radio"
+                        name="pf-align"
+                        value="right"
+                        data-bind="profile.align"
+                      /><span>Direita</span></label
+                    >
+                  </fieldset>
+                  <fieldset class="segmented">
+                    <legend>Tema do cartão</legend>
+                    <label
+                      ><input
+                        type="radio"
+                        name="pf-theme"
+                        value="light"
+                        data-bind="profile.theme"
+                      /><span>Claro</span></label
+                    ><label
+                      ><input
+                        type="radio"
+                        name="pf-theme"
+                        value="dark"
+                        data-bind="profile.theme"
+                      /><span>Escuro</span></label
+                    >
+                  </fieldset>
+                  <fieldset class="segmented">
+                    <legend>Posição do perfil</legend>
+                    <label
+                      ><input
+                        type="radio"
+                        name="pf-order"
+                        value="text-top"
+                        data-bind="profile.order"
+                      /><span>Texto ↑ · Perfil ↓</span></label
+                    ><label
+                      ><input
+                        type="radio"
+                        name="pf-order"
+                        value="profile-top"
+                        data-bind="profile.order"
+                      /><span>Perfil ↑ · Texto ↓</span></label
+                    >
+                  </fieldset>
+                  <div class="slider-grid">
+                    <label class="slider"
+                      ><span>Tamanho do avatar <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="profile.avatarSize"
+                        data-unit="px"
+                        step="2"
+                    /></label>
+                    <label class="slider"
+                      ><span>Fonte do nome <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="profile.nameSize"
+                        data-unit="px"
+                    /></label>
+                    <label class="slider"
+                      ><span>Fonte do @ <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="profile.handleSize"
+                        data-unit="px"
+                    /></label>
+                    <label class="slider"
+                      ><span>Tamanho da frase <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="style.size"
+                        data-unit="px"
+                    /></label>
+                    <label class="slider"
+                      ><span>Margem lateral <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="style.padding"
+                        data-unit="px"
+                        step="2"
+                    /></label>
+                    <label class="slider"
+                      ><span>Espaçamento externo <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="style.spacing"
+                        data-unit="px"
+                        step="2"
+                    /></label>
+                  </div>
+                  <div class="saved-row">
+                    <label
+                      >Escolher perfil salvo<select
+                        id="saved-profiles"
+                        data-saved="profiles"
+                      ></select></label
+                    ><button
+                      type="button"
+                      class="secondary"
+                      data-save-preset="profiles"
+                    >
+                      Salvar perfil
+                    </button>
+                  </div>
+                </fieldset>
+                <fieldset data-step="zones" class="step" hidden>
+                  <legend class="step-title">Zonas</legend>
+                  <p class="step-copy">
+                    Áreas de mídia empilhadas no vídeo. As alturas são
+                    proporcionais entre si e ocupam o espaço livre do cartão.
+                  </p>
+                  <p class="group-label">Modelos prontos</p>
+                  <div id="zone-presets" class="preset-grid"></div>
+                  <label class="switch"
+                    ><input type="checkbox" id="zone-blur" /> Fundo desfocado
+                    com o vídeo principal</label
+                  >
+                  <ol id="zone-list" class="zone-list"></ol>
+                  <button type="button" id="zone-add" class="secondary">
+                    ＋ Adicionar zona
+                  </button>
+                  <p class="field-help">
+                    O vídeo principal é a primeira área de vídeo, de cima para
+                    baixo. O corte dele define a duração e só o áudio dele é
+                    usado. Vídeos secundários mais curtos congelam no último
+                    quadro.
+                  </p>
+                </fieldset>
+                <fieldset data-step="phrases" class="step" hidden>
+                  <legend class="step-title">Frases</legend>
+                  <p class="step-copy">
+                    Cada frase selecionada gera uma versão para cada combinação
+                    de mídia.
+                  </p>
+                  <section class="card-block" aria-labelledby="ai-title">
+                    <h3 id="ai-title">
+                      Gerar automaticamente
+                      <span class="pill">Recomendado</span>
+                    </h3>
+                    <p id="ai-status" class="field-help" role="status"></p>
+                    <label
+                      >Descreva a ideia do vídeo<textarea
+                        id="ai-description"
+                        rows="3"
+                        maxlength="1000"
+                        placeholder="Ex.: bastidores da gravação do nosso podcast sobre finanças pessoais"
+                      ></textarea></label
+                    ><label class="inline-select"
+                      >Quantidade de sugestões<select id="ai-count">
+                        <option>3</option>
+                        <option selected>5</option>
+                        <option>8</option>
+                        <option>10</option>
+                      </select></label
+                    ><button type="button" id="ai-generate" class="primary">
+                      Gerar frases
+                    </button>
+                  </section>
+                  <section class="card-block" aria-labelledby="manual-title">
+                    <h3 id="manual-title">Escrever frase</h3>
+                    <label
+                      >Frase<textarea
+                        id="phrase-input"
+                        rows="3"
+                        maxlength="280"
+                        aria-describedby="phrase-counter"
+                      ></textarea>
+                    </label>
+                    <p id="phrase-counter" class="field-help">0/280</p>
+                    <button type="button" id="phrase-add" class="secondary">
+                      Adicionar frase
+                    </button>
+                  </section>
+                  <h3 class="list-title">
+                    Frases do projeto (<span id="phrase-total">0</span>)
+                  </h3>
+                  <ol id="phrase-list" class="phrase-list"></ol>
+                </fieldset>
+                <fieldset data-step="media" class="step" hidden>
+                  <legend class="step-title">Mídia</legend>
+                  <p class="step-copy">
+                    Envie quantos arquivos quiser por zona. Cada arquivo vira
+                    uma opção de variação.
+                  </p>
+                  <fieldset class="segmented" id="media-slots">
+                    <legend>Zona</legend>
+                  </fieldset>
+                  <div class="media-toolbar">
+                    <label class="primary upload-label"
+                      >↑ Enviar arquivos<input
+                        type="file"
+                        id="media-file"
+                        class="visually-hidden"
+                        multiple /></label
+                    ><label class="inline-select"
+                      >Adicionar da biblioteca<select
+                        id="media-library"
+                      ></select
+                    ></label>
+                    <div class="view-toggle" role="group" aria-label="Exibição">
+                      <button
+                        type="button"
+                        data-view="grid"
+                        aria-pressed="true"
+                      >
+                        Grade</button
+                      ><button
+                        type="button"
+                        data-view="list"
+                        aria-pressed="false"
+                      >
+                        Lista
+                      </button>
+                    </div>
+                  </div>
+                  <p id="media-status" class="field-help" role="status"></p>
+                  <ul id="media-grid" class="media-grid"></ul>
+                  <section
+                    id="media-editor"
+                    class="card-block"
+                    aria-labelledby="media-editor-title"
+                    hidden
+                  >
+                    <h3 id="media-editor-title">Ajustes da opção</h3>
+                    <div id="trim-box">
+                      <p class="group-label">
+                        Corte <output id="trim-readout"></output>
+                      </p>
+                      <div class="trim">
+                        <i id="trim-fill"></i
+                        ><input
+                          type="range"
+                          id="trim-start"
+                          aria-label="Início do corte"
+                          step="0.1"
+                        /><input
+                          type="range"
+                          id="trim-end"
+                          aria-label="Fim do corte"
+                          step="0.1"
+                        />
+                      </div>
+                    </div>
+                    <div class="slider-grid">
+                      <label class="slider"
+                        ><span>Zoom <output></output></span
+                        ><input
+                          type="range"
+                          data-option="zoom"
+                          min="1"
+                          max="3"
+                          step="0.01"
+                          data-unit="×"
+                      /></label>
+                      <label class="slider"
+                        ><span>Posição horizontal <output></output></span
+                        ><input
+                          type="range"
+                          data-option="x"
+                          min="0"
+                          max="100"
+                          data-unit="%"
+                      /></label>
+                      <label class="slider"
+                        ><span>Posição vertical <output></output></span
+                        ><input
+                          type="range"
+                          data-option="y"
+                          min="0"
+                          max="100"
+                          data-unit="%"
+                      /></label>
+                    </div>
+                    <button type="button" id="media-center" class="text-button">
+                      Restaurar enquadramento
+                    </button>
+                  </section>
+                  <label class="switch"
+                    ><input type="checkbox" data-bind="mute" /> Remover o áudio
+                    do vídeo principal</label
+                  >
+                </fieldset>
+                <fieldset data-step="style" class="step" hidden>
+                  <legend class="step-title">Estilo</legend>
+                  <p class="step-copy">
+                    Tipografia da frase. A prévia repete os 3 primeiros segundos
+                    do corte.
+                  </p>
+                  <label
+                    >Fonte da frase<select
+                      id="style-font"
+                      data-bind="style.font"
+                    ></select
+                  ></label>
+                  <fieldset class="color-field">
+                    <legend>Cor da frase</legend>
+                    <div class="swatches" id="style-swatches"></div>
+                    <label class="inline-select"
+                      >Hexadecimal<input
+                        id="style-color"
+                        maxlength="7"
+                        spellcheck="false"
+                        autocomplete="off"
+                    /></label>
+                  </fieldset>
+                  <label class="switch"
+                    ><input type="checkbox" data-bind="style.stroke" /> Contorno
+                    nas letras</label
+                  >
+                  <div class="field-row">
+                    <label class="slider"
+                      ><span>Espessura do contorno <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="style.strokeWidth"
+                        data-unit="px" /></label
+                    ><label
+                      >Cor do contorno<input
+                        type="color"
+                        data-bind="style.strokeColor"
+                    /></label>
+                  </div>
+                  <div class="slider-grid">
+                    <label class="slider"
+                      ><span>Tamanho da frase <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="style.size"
+                        data-unit="px"
+                    /></label>
+                    <label class="slider"
+                      ><span>Margem lateral <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="style.padding"
+                        data-unit="px"
+                        step="2"
+                    /></label>
+                    <label class="slider"
+                      ><span>Espaçamento externo <output></output></span
+                      ><input
+                        type="range"
+                        data-bind="style.spacing"
+                        data-unit="px"
+                        step="2"
+                    /></label>
+                  </div>
+                  <div class="saved-row">
+                    <label
+                      >Escolher estilo salvo<select
+                        data-saved="styles"
+                      ></select></label
+                    ><button
+                      type="button"
+                      class="secondary"
+                      data-save-preset="styles"
+                    >
+                      Salvar estilo
+                    </button>
+                  </div>
+                </fieldset>
+                <fieldset data-step="variations" class="step" hidden>
+                  <legend class="step-title">Variações</legend>
+                  <p class="step-copy">
+                    Total = mídias selecionadas em cada zona × frases
+                    selecionadas.
+                  </p>
+                  <p class="variation-total" aria-live="polite">
+                    Gerar <strong id="variation-count">0</strong> variações
+                  </p>
+                  <p id="variation-help" class="field-help"></p>
+                  <div id="variation-slots"></div>
+                  <fieldset class="check-group">
+                    <legend id="variation-phrases-title">Frases</legend>
+                    <div class="check-actions">
+                      <button
+                        type="button"
+                        class="text-button"
+                        data-all="phrases"
+                      >
+                        Selecionar todas</button
+                      ><button
+                        type="button"
+                        class="text-button"
+                        data-none="phrases"
+                      >
+                        Limpar
+                      </button>
+                    </div>
+                    <ul id="variation-phrases" class="check-list"></ul>
+                  </fieldset>
+                </fieldset>
+                <fieldset data-step="generate" class="step" hidden>
+                  <legend class="step-title">Gerar</legend>
+                  <p class="step-copy">
+                    O lote entra na fila do servidor e continua mesmo se você
+                    fechar o navegador.
+                  </p>
+                  <div class="generate-head">
+                    <p id="generate-summary"></p>
+                    <button type="button" id="generate-start" class="primary">
+                      Gerar variações
+                    </button>
+                  </div>
+                  <p id="generate-quota" class="field-help"></p>
+                  <label class="inline-select" id="batch-picker" hidden
+                    >Lote<select id="batch-select"></select
+                  ></label>
+                  <div id="batch-toolbar" class="actions" hidden>
+                    <button type="button" id="batch-cancel" class="danger">
+                      Cancelar lote</button
+                    ><button type="button" id="batch-retry" class="secondary">
+                      Tentar novamente as falhas</button
+                    ><a id="batch-zip" class="secondary" href="#"
+                      >Baixar todas (ZIP)</a
+                    ><button type="button" id="batch-remove" class="danger">
+                      Remover lote
+                    </button>
+                  </div>
+                  <p id="batch-status" class="field-help" role="status"></p>
+                  <ol id="batch-grid" class="batch-grid"></ol>
+                </fieldset>
+                <p id="builder-error" class="error" role="alert"></p>
+                <div class="builder-footer">
+                  <button type="button" class="secondary" id="builder-back">
+                    ← Etapa anterior</button
+                  ><button type="submit" class="primary" id="builder-next">
+                    Salvar e continuar
+                  </button>
+                </div>
+              </form>
+              <aside class="builder-preview" aria-label="Prévia ao vivo">
+                <div class="preview-label">
+                  PRÉVIA AO VIVO <span>9:16 · 720 × 1280</span>
+                </div>
+                <div id="stage" class="stage">
+                  <canvas
+                    id="stage-blur"
+                    width="90"
+                    height="160"
+                    aria-hidden="true"
+                    hidden
+                  ></canvas>
+                  <div id="stage-cells"></div>
+                  <img id="stage-overlay" alt="" hidden />
+                </div>
+                <div class="stage-controls">
+                  <button type="button" id="stage-play" class="secondary">
+                    ▶ Reproduzir</button
+                  ><span id="stage-time" class="field-help"></span>
+                </div>
+                <p id="stage-status" class="field-help" role="status"></p>
+              </aside>
+            </div>
           </section>
           <section id="library" class="page" hidden>
             <div class="heading">
               <div>
                 <p class="eyebrow">A MATÉRIA-PRIMA DAS SUAS IDEIAS</p>
-                <h1>Meus vídeos<span>.</span></h1>
+                <h1>Biblioteca<span>.</span></h1>
                 <p>
-                  Até 100 MB e 10 minutos por vídeo. 2 GB de espaço por conta.
+                  Vídeos MP4, MOV ou WebM de até 10 minutos e imagens PNG, JPEG
+                  ou WebP. Até 100 MB por arquivo.
                 </p>
               </div>
-              <button class="primary" id="upload-button">↑ Enviar vídeo</button
+              <button class="primary" id="upload-button">
+                ↑ Enviar arquivo</button
               ><input
                 id="library-upload"
                 type="file"
-                accept="video/mp4,video/webm,video/quicktime"
+                accept="video/mp4,video/webm,video/quicktime,image/png,image/jpeg,image/webp"
                 hidden
               />
             </div>

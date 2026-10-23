@@ -1,6 +1,8 @@
 # ViceClipz Studio — v0.3
 
-Novidade: biblioteca de referências de sites/RSS/Atom, Instagram e TikTok; métricas do estúdio e apresentação em `/sobre`. Consulte [configuração, limites e validação](docs/COLETA-METRICAS.md).
+Novidade: editor de templates em 7 etapas (Post card, Meme e Vídeo viral) com cartão de perfil, zonas de vídeo e imagem, frases, estilos salvos e lotes de até 50 variações em MP4. Consulte [templates e variações](docs/TEMPLATES.md).
+
+Também: biblioteca de referências de sites/RSS/Atom, Instagram e TikTok; métricas do estúdio e apresentação em `/sobre`. Consulte [configuração, limites e validação](docs/COLETA-METRICAS.md).
 
 Contas, upload, edição e MP4 real, agora com interface para integrações sociais, agendamento e assinaturas. Backend Node/SQLite/FFmpeg persistente; interface preparada para Vercel. Consulte o [guia de deploy e ativação](docs/DEPLOY-VERCEL.md). Credenciais externas e domínio ainda não estão configurados. A hospedagem Sites da etapa 1 continua sendo apenas a prévia antiga.
 
@@ -13,9 +15,9 @@ npm ci
 npm run dev
 ```
 
-Abra **http://127.0.0.1:4173/** e crie sua conta. Crie um projeto, envie um vídeo, escolha o corte e a composição e clique em **Exportar MP4**. Acompanhe em **Exportações** e faça o download.
+Abra **http://127.0.0.1:4173/** e crie sua conta. Em **Templates**, escolha um modelo e siga as etapas: perfil, zonas, frases, mídia, estilo, variações e gerar. Acompanhe o lote no próprio editor ou em **Exportações** e faça o download. Projetos criados antes dos templates continuam no editor clássico.
 
-Até 100 MB e 10 minutos por vídeo; corte final de até 120 segundos; formatos 720 × 1280, 720 × 720 e 720 × 900. Localmente, 2 GB por conta e integrações desativadas até configurar as credenciais. Em produção, cotas dependem do plano.
+Até 100 MB por arquivo e 10 minutos por vídeo; imagens PNG, JPEG ou WebP; corte final de até 120 segundos; templates em 720 × 1280 e projetos clássicos também em 720 × 720 e 720 × 900. Sugestões automáticas de frases exigem `ANTHROPIC_API_KEY` no backend. Localmente, 2 GB por conta e integrações desativadas até configurar as credenciais. Em produção, cotas dependem do plano.
 
 ## Validar
 
@@ -29,6 +31,7 @@ Os testes criam contas e vídeos sintéticos em uma instância separada, verific
 ## Documentação
 
 - [Guia do MVP, arquitetura, limites, operação e implantação](docs/MVP.md)
+- [Templates, zonas, frases, lotes de variações e frases automáticas](docs/TEMPLATES.md)
 - [Plano de três etapas](docs/PLANO.md)
 - [Deploy Vercel, backend persistente e ativação dos provedores](docs/DEPLOY-VERCEL.md)
 - [Evidências de validação da etapa 3](docs/VALIDACAO-ETAPA3.md)
