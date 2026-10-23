@@ -1,0 +1,33 @@
+# Single-VPS deployment behind an existing reverse proxy (e.g. Nginx Proxy Manager)
+# that already owns ports 80/443. No host ports are published: the proxy reaches
+# the container as viceclipz:4173 on the shared external network.
+services:
+  studio:
+    build: .
+    container_name: viceclipz
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      DATA_DIR: /app/data
+      FFMPEG_PATH: /usr/bin/ffmpeg
+      FFPROBE_PATH: /usr/bin/ffprobe
+    volumes:
+      - viceclipz-data:/app/data
+    networks:
+      - proxy
+    restart: unless-stopped
+    stop_grace_period: 15s
+    mem_limit: 1200m
+    cpus: 0.9
+    healthcheck:
+      test: [CMD, node, -e, "require('http').get({host:'127.0.0.1',port:4173,path:'/api/health',timeout:4000,headers:{host:new URL(process.env.APP_ORIGIN).host}},r=>{let b='';r.on('data',d=>b+=d).on('end',()=>{try{const h=JSON.parse(b);process.exit(h.worker&&h.automation?0:1)}catch{process.exit(1)}})}).on('error',()=>process.exit(1)).on('timeout',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+volumes:
+  viceclipz-data:
+networks:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:-apps}

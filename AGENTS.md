@@ -61,6 +61,7 @@ Implementation is not evidence of external activation. Do not claim that OAuth a
 | `build-vercel.mjs`, `vercel.json` | Static deployment packaging and external API proxy |
 | `Dockerfile`, `compose.yaml` | Persistent backend image and local container configuration |
 | `compose.production.yaml`, `Caddyfile` | Production backend, persistent volumes and HTTPS proxy |
+| `compose.vps.yaml` | Single-VPS backend behind an existing reverse proxy network, no published ports |
 | `backup.mjs` | Offline, integrity-checked backup and restore to a new directory |
 | `.env.example` | Configuration names and non-secret examples |
 | `docs/` | Product plan, MVP behavior, deployment and validation records |
