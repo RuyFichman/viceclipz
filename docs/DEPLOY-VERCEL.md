@@ -24,6 +24,16 @@ Pode ser uma VPS com Docker/Compose. Comprar domínio na Hostinger não obriga h
 
 O Compose limita o serviço a 2 GB e 2 CPUs como ponto de partida, ainda sem teste de carga. As cotas por usuário não substituem monitorar o espaço global do volume.
 
+### VPS compartilhada com proxy existente
+
+Quando outro proxy (por exemplo Nginx Proxy Manager) já ocupa 80/443, use `compose.vps.yaml` em vez de `compose.production.yaml`. Ele sobe só o estúdio, sem portas publicadas e sem Caddy, na rede Docker externa do proxy (`PROXY_NETWORK`, padrão `apps`), com limite de 0,9 CPU e 1200 MB para caber em VPS de 1 vCPU.
+
+1. Interface e API podem ficar no mesmo host, sem Vercel: use o mesmo nome em APP_ORIGIN (`https://host`) e BACKEND_HOST (`host`).
+2. `docker compose -f compose.vps.yaml up -d --build`.
+3. No proxy, crie um host para esse nome apontando para `viceclipz:4173` (HTTP), com certificado Let's Encrypt, HTTPS forçado e, na configuração avançada, `client_max_body_size 105m;`, `proxy_read_timeout 300s;` e `proxy_send_timeout 300s;`.
+
+Limitação: atrás do proxy o servidor vê o IP do proxy, então os limites de login e de ações de conta por IP passam a ser compartilhados por todos os usuários. Aceitável para um beta pequeno por convite; antes de abrir ao público, defina uma fronteira de proxy confiável para ler o IP real.
+
 ## Vercel
 
 Importe o repositório e escolha **viceclipz-studio** como Root Directory se estiver dentro do repositório pai. Framework: **Other**. O vercel.json define instalação sem dependências e `node build-vercel.mjs` como build. Não use npm start nem crie Function para o backend.

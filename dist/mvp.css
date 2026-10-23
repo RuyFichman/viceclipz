@@ -160,6 +160,12 @@
   font-size: 12px;
   padding: 0;
 }
+.auth-box .text-button {
+  display: block;
+}
+#forgot-password {
+  margin-top: -12px;
+}
 .error {
   font-size: 12px;
   color: #f6b0ad;
