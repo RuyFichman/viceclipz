@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "node server.mjs",
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check lib/api.mjs && node --check lib/account.mjs && node --check lib/discovery.mjs && node --check lib/discovery-fetch.mjs && node --check worker.mjs && node --check automation-worker.mjs && node --check dist/studio.js && node --check dist/launch.js && node --check dist/account.js && node --check dist/discovery.js",
+    "check": "node --check server.mjs && node --check lib/api.mjs && node --check lib/account.mjs && node --check lib/discovery.mjs && node --check lib/discovery-fetch.mjs && node --check worker.mjs && node --check automation-worker.mjs && node --check dist/studio.js && node --check dist/launch.js && node --check dist/account.js && node --check dist/discovery.js && node --check deploy-vps.mjs",
     "test": "node --test --test-concurrency=1 tests/integration.test.mjs tests/launch.test.mjs tests/account.test.mjs tests/discovery.test.mjs",
     "build:vercel": "node build-vercel.mjs",
-    "format": "prettier --write server.mjs worker.mjs automation-worker.mjs build-vercel.mjs lib/*.mjs dist/studio.js dist/launch.js dist/account.js dist/launch.css dist/mvp.css dist/index.html tests/*.mjs"
+    "deploy:vps": "node deploy-vps.mjs",
+    "format": "prettier --write server.mjs worker.mjs automation-worker.mjs build-vercel.mjs deploy-vps.mjs lib/*.mjs dist/studio.js dist/launch.js dist/account.js dist/launch.css dist/mvp.css dist/index.html tests/*.mjs"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.0.13",

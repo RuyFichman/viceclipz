@@ -31,6 +31,7 @@ Quando outro proxy (por exemplo Nginx Proxy Manager) já ocupa 80/443, use `comp
 1. Interface e API podem ficar no mesmo host, sem Vercel: use o mesmo nome em APP_ORIGIN (`https://host`) e BACKEND_HOST (`host`).
 2. `docker compose -f compose.vps.yaml up -d --build`.
 3. No proxy, crie um host para esse nome apontando para `viceclipz:4173` (HTTP), com certificado Let's Encrypt, HTTPS forçado e, na configuração avançada, `client_max_body_size 105m;`, `proxy_read_timeout 300s;` e `proxy_send_timeout 300s;`.
+4. Atualizações: `npm run deploy:vps -- usuario@host --key CAMINHO_DA_CHAVE`. O script envia o commit atual (não as alterações sem commit) para `~/viceclipz.next`, copia o `.env` do servidor, constrói a imagem com o contêiner antigo ainda no ar, troca as pastas, aguarda o healthcheck e confere `/api/health` pela URL pública. A versão anterior fica em `~/viceclipz.prev`; `npm run deploy:vps -- usuario@host --rollback` volta para ela mantendo o `.env` atual.
 
 Limitação: atrás do proxy o servidor vê o IP do proxy, então os limites de login e de ações de conta por IP passam a ser compartilhados por todos os usuários. Aceitável para um beta pequeno por convite; antes de abrir ao público, defina uma fronteira de proxy confiável para ler o IP real.
 
