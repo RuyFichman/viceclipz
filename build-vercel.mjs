@@ -1,6 +1,7 @@
 import { mkdir, copyFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+const LEGAL_PAGES = ["termos", "privacidade", "retencao", "suporte"];
 export function deploymentConfig(value) {
   let backend;
   try {
@@ -39,6 +40,10 @@ export function deploymentConfig(value) {
       },
       { src: "/api/(.*)", dest: backend.origin + "/api/$1" },
       { src: "/sobre", dest: "/landing.html" },
+      ...LEGAL_PAGES.map((page) => ({
+        src: "/" + page,
+        dest: "/" + page + ".html",
+      })),
       { handle: "filesystem" },
       { src: "/(.*)", status: 404, dest: "/404.html" },
     ],
@@ -62,6 +67,7 @@ export async function build(destination, backend) {
     "templates.js",
     "template-core.js",
     "templates.css",
+    ...LEGAL_PAGES.map((page) => page + ".html"),
   ])
     await copyFile(
       path.join(root, "dist", file),

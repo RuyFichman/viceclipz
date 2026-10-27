@@ -62,6 +62,14 @@
                 autocomplete="current-password"
                 placeholder="Pelo menos 10 caracteres"
             /></label>
+            <p id="auth-legal" class="auth-legal" hidden>
+              Ao criar a conta, você concorda com os
+              <a href="/termos" target="_blank" rel="noopener">Termos de uso</a>
+              e declara ter lido a
+              <a href="/privacidade" target="_blank" rel="noopener"
+                >Política de privacidade</a
+              >.
+            </p>
             <p id="auth-error" class="error" role="alert"></p>
             <button class="primary" id="auth-submit">
               Entrar no estúdio ↗
@@ -74,6 +82,10 @@
             <a href="/sobre">Conheça o ViceClipz ↗</a><br />
             Até 100 MB por vídeo · exportações de até 2 minutos.<br />Contas e
             arquivos ficam neste servidor.
+          </p>
+          <p class="field-help legal-links">
+            <a href="/termos">Termos</a><a href="/privacidade">Privacidade</a
+            ><a href="/retencao">Retenção</a><a href="/suporte">Suporte</a>
           </p>
         </div>
       </div>
@@ -841,7 +853,15 @@
           <footer>
             <a class="brand" href="#overview">viceclipz <span>✦</span></a
             ><span>Feito para quem tem algo a criar.</span
-            ><span>ETAPA 03 — PUBLICAÇÃO E ASSINATURAS</span>
+            ><span class="legal-links"
+              ><a href="/termos" target="_blank" rel="noopener">Termos</a
+              ><a href="/privacidade" target="_blank" rel="noopener"
+                >Privacidade</a
+              ><a href="/retencao" target="_blank" rel="noopener">Retenção</a
+              ><a href="/suporte" target="_blank" rel="noopener"
+                >Suporte</a
+              ></span
+            >
           </footer>
         </main>
       </div>

@@ -26,7 +26,7 @@ O beta por convite permanece ativo: BETA_EMAILS continua restringindo novos cada
 
 ## Fluxos
 
-**Cadastro:** cria uma conta não verificada e uma sessão limitada, enfileira a mensagem e mostra a tela de confirmação. Essa sessão acessa somente o estado da conta, reenvio e logout; assets, projetos, exportações, integrações, agendamentos e cobrança ficam bloqueados enquanto a verificação for exigida.
+**Cadastro:** cria uma conta não verificada e uma sessão limitada, enfileira a mensagem e mostra a tela de confirmação. Essa sessão acessa somente o estado da conta, reenvio, logout e exclusão da conta; assets, projetos, exportações, integrações, agendamentos e cobrança ficam bloqueados enquanto a verificação for exigida.
 
 **Confirmação:** o link abre um formulário e o usuário precisa clicar em Confirmar meu e-mail. GET/navegação não consomem o token, evitando confirmação automática por scanners. A conclusão marca o e-mail como verificado, invalida links de conta e sessões/OAuth pendentes, e exige novo login.
 
@@ -35,6 +35,17 @@ O beta por convite permanece ativo: BETA_EMAILS continua restringindo novos cada
 **Recuperação:** Esqueci minha senha aceita um e-mail e responde com a mesma mensagem para contas existentes, desconhecidas ou com limite de envio excedido. A senha e as sessões não mudam durante a solicitação. O novo link de recuperação substitui o anterior. Após informar uma senha válida pelo link, a transação altera o hash, marca a posse do e-mail como confirmada, invalida todos os links/sessões da conta e estados OAuth pendentes. Não há login automático.
 
 Dados, projetos, arquivos e assinaturas são preservados. A redefinição não remove conexões sociais nem cancela publicações já agendadas; tokens de provedores têm ciclo próprio.
+
+## Exclusão de conta
+
+`POST /api/auth/delete-account` com `{ password, confirm: "EXCLUIR" }`, disponível em Sua conta e, para contas não verificadas, na tela de confirmação. Exige a senha atual e as verificações de origem/CSRF; 10 tentativas por conta em 15 minutos.
+
+- **Bloqueios (409):** assinatura cobrável sem cancelamento ao fim do período (active, trialing, past_due, unpaid, paused, incomplete); publicação em `preparing`/`publishing`, cuja mídia ainda pode ser lida pelo provedor; upload em andamento.
+- **Exportações:** na mesma transação, exportações na fila são canceladas (reserva liberada) e as em execução passam a `cancelling`. A resposta pede nova tentativa em alguns segundos, depois que o worker confirmar o cancelamento. Nada é apagado enquanto houver render ativo.
+- **Remoção:** uma transação apaga as linhas de todas as tabelas com `user_id` (lista fixa em `lib/account-deletion.mjs`), `asset_kinds` em cascata, os `billing_events` que citam o cliente Stripe e o usuário. Depois do commit, os arquivos de mídia e MP4 são removidos e o cookie é limpo. Falhas ao apagar arquivos são registradas apenas como contagem.
+- **Fora do servidor:** o cliente e o histórico de pagamento continuam no Stripe; eventos posteriores de uma assinatura cuja conta foi excluída são ignorados pela reconciliação. Publicações feitas continuam nas redes e a autorização do app deve ser revogada pelo titular na rede. Backups mantêm os dados até o fim do ciclo de retenção.
+- Ao adicionar uma tabela com `user_id`, inclua-a em `OWNED_TABLES`. O teste de exclusão em `tests/launch.test.mjs` percorre todas as tabelas com essa coluna e falha se alguma mantiver linhas do titular.
+- O histórico de cotas é apagado junto: um mesmo e-mail cadastrado de novo começa com cota zerada.
 
 ## Proteções e armazenamento
 

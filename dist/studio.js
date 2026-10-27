@@ -55,6 +55,7 @@ const labels = {
   integrations: "Contas conectadas",
   publishing: "Publicações",
   billing: "Seu plano",
+  account: "Sua conta",
   discovery: "Descobrir conteúdo",
   metrics: "Métricas do estúdio",
 };
@@ -675,6 +676,7 @@ async function save(exportAfter = false) {
 $("#auth-toggle").onclick = () => {
   register = !register;
   $("#name-label").hidden = !register;
+  $("#auth-legal").hidden = !register;
   $("#auth-name").required = register;
   $("#auth-title").textContent = register
     ? "Seu próximo capítulo."
