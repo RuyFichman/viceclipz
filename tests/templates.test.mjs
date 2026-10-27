@@ -5,6 +5,7 @@ import { createServer } from "node:http";
 import { mkdirSync, readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import path from "node:path";
+import { createCanvas, loadImage } from "@napi-rs/canvas";
 process.env.DATA_DIR = path.resolve(
   ".test-data-templates-unit-" + randomUUID(),
 );
@@ -397,6 +398,32 @@ await test("Templates: migração, validação, cotas de lote, presets salvos e 
           out2.slice(out2.lastIndexOf("-ss"), out2.lastIndexOf("-ss") + 4),
           ["-ss", "0", "-t", "1.000"],
         );
+      },
+    );
+    await t.test(
+      "selo de verificado sai no azul do X (#1D9BF0) só quando ativado",
+      async () => {
+        const badgePixels = async (verified) => {
+          const spec = core.defaultTemplate("post", "Ruy");
+          spec.profile = { ...spec.profile, handle: "ruy", verified };
+          const png = await loadImage(renderOverlay(spec, "Uma frase").image),
+            canvas = createCanvas(png.width, png.height),
+            ctx = canvas.getContext("2d");
+          ctx.drawImage(png, 0, 0);
+          const data = ctx.getImageData(0, 0, png.width, png.height).data;
+          let blue = 0;
+          for (let i = 0; i < data.length; i += 4)
+            if (
+              data[i] === 0x1d &&
+              data[i + 1] === 0x9b &&
+              data[i + 2] === 0xf0 &&
+              data[i + 3] === 255
+            )
+              blue++;
+          return blue;
+        };
+        assert((await badgePixels(true)) > 100);
+        assert.equal(await badgePixels(false), 0);
       },
     );
     await t.test(

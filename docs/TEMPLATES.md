@@ -5,7 +5,7 @@ O editor de templates substitui a criação de projetos com headline em faixa. E
 ## Fluxo
 
 1. **Galeria** (`#templates`): Post card, Meme e Vídeo viral. "Usar este template" cria o template na conta e abre o editor em `#builder/<id>`.
-2. **Perfil**: avatar (envio ou biblioteca), selo de verificado, nome, @, alinhamento, tema claro/escuro, posição (texto ↑ · perfil ↓ ou o inverso) e tamanhos em pixels de saída. "Salvar perfil" grava um perfil reutilizável; "Escolher perfil salvo" aplica uma cópia.
+2. **Perfil**: avatar (envio ou biblioteca), selo de verificado (círculo com check branco, no azul #1D9BF0 do X), nome, @, alinhamento, tema claro/escuro, posição (texto ↑ · perfil ↓ ou o inverso) e tamanhos em pixels de saída. "Salvar perfil" grava um perfil reutilizável; "Escolher perfil salvo" aplica uma cópia.
 3. **Zonas**: até 4 zonas, cada uma com uma área ou duas lado a lado; tipo (vídeo ou imagem), enquadramento (preencher ou mostrar inteiro) e altura relativa. Modelos prontos: 1 vídeo, 1 vídeo com fundo blur, 2 vídeos empilhados, imagem fixa + vídeo, vídeo + 2 imagens. Reordenação por arrastar ou pelos botões ↑/↓.
 4. **Frases**: até 50 frases de até 280 caracteres e 8 linhas. Geração automática opcional (marcada como AUTO) e escrita manual.
 5. **Mídia**: até 20 opções por área. Cada vídeo tem corte, zoom (1–3×) e posição horizontal/vertical (0–100%); imagens têm zoom e posição.
