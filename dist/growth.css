@@ -253,3 +253,21 @@
     padding: 20px;
   }
 }
+/* Target sizes: at least 24 px, and 44 px on touch screens. */
+.marketing nav a,
+.marketing .hero > a,
+.marketing .legal-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+@media (max-width: 800px), (pointer: coarse) {
+  .marketing nav a,
+  .marketing .hero > a,
+  .marketing .legal-links a {
+    min-height: 44px;
+  }
+  .marketing summary {
+    padding: 9px 0;
+  }
+}

@@ -496,8 +496,21 @@ function syncOutputs() {
   for (const input of $$("#builder input[type=range]:not([data-share])")) {
     const out = input.closest("label")?.querySelector("output");
     if (out) out.textContent = formatValue(input);
+    if (input.dataset.unit)
+      input.setAttribute("aria-valuetext", formatValue(input));
   }
 }
+// <output> is labelable, so a <label class="slider"> names its output instead of
+// the slider; name each slider from the caption it shows.
+for (const input of $$("#builder label.slider input[type=range]"))
+  if (!input.labels.length)
+    input.setAttribute(
+      "aria-label",
+      input
+        .closest("label")
+        .querySelector("span")
+        .firstChild.textContent.trim(),
+    );
 function fillInputs() {
   for (const input of $$("#builder [data-bind]")) {
     if (input === document.activeElement && input.type !== "range") continue;

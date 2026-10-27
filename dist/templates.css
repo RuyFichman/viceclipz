@@ -39,13 +39,13 @@
   font-weight: 500;
 }
 .layout-info p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
   color: var(--muted);
   margin: 0;
 }
 .format-chip {
-  font-size: 9px;
+  font-size: 12px;
   color: #b0b1b8;
   padding: 5px 8px;
   border: 1px solid #36373e;
@@ -125,6 +125,7 @@
 .s-zone.image {
   background: linear-gradient(160deg, #c9a7ff, #5a3d8a);
 }
+/* Decorative label inside the aria-hidden gallery schematic. */
 .s-zone em {
   font-style: normal;
   font-size: 7px;
@@ -150,7 +151,7 @@
   font-family: "Space Grotesk", sans-serif;
 }
 .builder-status {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   margin: 0 0 12px;
   min-width: 120px;
@@ -188,7 +189,7 @@
   height: 22px;
   border-radius: 50%;
   background: #2a2232;
-  font-size: 11px;
+  font-size: 12px;
 }
 .step-button[aria-current="step"] {
   border-color: var(--accent);
@@ -204,7 +205,7 @@
 }
 .step-lock {
   min-height: 18px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--orange);
   margin: 0 0 12px;
 }
@@ -280,7 +281,7 @@
   padding: 4px;
 }
 .group-label {
-  font-size: 11px;
+  font-size: 12px;
   color: #c5c8cf;
   margin: 0 0 10px;
 }
@@ -351,7 +352,7 @@
 .empty-thumb {
   display: grid;
   place-items: center;
-  font-size: 8px;
+  font-size: 12px;
   color: var(--muted);
   border: 1px dashed #4a4152;
   text-align: center;
@@ -379,7 +380,7 @@
   gap: 6px;
 }
 .segmented legend {
-  font-size: 11px;
+  font-size: 12px;
   color: #c5c8cf;
   padding: 0;
   margin-bottom: 8px;
@@ -449,7 +450,7 @@
 }
 .pill {
   display: inline-block;
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.6px;
   font-weight: 600;
   padding: 3px 7px;
@@ -525,7 +526,7 @@
   border: 1px solid var(--line);
   background: #130f18;
   color: #d8d2e1;
-  font-size: 11px;
+  font-size: 12px;
   text-align: center;
   line-height: 1.4;
 }
@@ -669,7 +670,7 @@
   background: transparent;
   color: #c9c3d3;
   padding: 9px 12px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .view-toggle button[aria-pressed="true"] {
   background: #2d1631;
@@ -732,7 +733,7 @@
 .thumb.missing {
   display: grid;
   place-items: center;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .media-meta {
@@ -745,7 +746,7 @@
   font-weight: 500;
 }
 .media-meta small {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
@@ -817,7 +818,7 @@
   margin: 0 0 16px;
 }
 .color-field legend {
-  font-size: 11px;
+  font-size: 12px;
   color: #c5c8cf;
   padding: 0;
   margin-bottom: 8px;
@@ -979,7 +980,7 @@
   border-radius: 8px;
 }
 .batch-detail {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   line-height: 1.5;
   margin: 0;
@@ -1039,7 +1040,7 @@
   display: grid;
   place-items: center;
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   color: #b7aec3;
   border: 1px dashed #4e4458;
   border-radius: 6px;

@@ -169,7 +169,7 @@ button:disabled {
 .side-nav {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   flex: 1 0 auto;
 }
 .nav-group {
@@ -295,7 +295,8 @@ button:disabled {
   .toast {
     bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 12px);
   }
-  .builder-footer {
+  /* templates.css loads later and pins the footer to bottom: 0 below 560 px. */
+  #builder .builder-footer {
     bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
   }
 }
@@ -510,4 +511,92 @@ body:has(#more-sheet[open]) {
   justify-items: start;
   margin-top: auto;
   padding-top: 6px;
+}
+/* Target sizes: at least 24 px everywhere (WCAG 2.5.8) and 44 px on touch screens.
+   Links inside running text are exempt; standalone links get a taller box. */
+.legal-links a,
+#account .launch-card p > a,
+footer .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+.switch,
+.check-label,
+.phrase-pick,
+.check-list label {
+  min-height: 24px;
+}
+@media (max-width: 800px), (pointer: coarse) {
+  button,
+  select,
+  input:not([type="checkbox"], [type="radio"], [type="range"]),
+  .primary,
+  .secondary,
+  .light,
+  .danger,
+  .text-button,
+  .legal-links a,
+  .section-heading a,
+  footer .brand,
+  .header-brand,
+  .auth-story > .brand,
+  #account .launch-card p > a,
+  #builder input[type="range"] {
+    min-height: 44px;
+  }
+  .text-button,
+  .legal-links a {
+    min-width: 44px;
+  }
+  .download-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .icon-button,
+  .swatch {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .switch,
+  .check-label,
+  .phrase-pick,
+  .check-list label {
+    min-height: 44px;
+  }
+  /* Dual trim slider: only the thumbs take pointer events, so they get the
+     44 px hit area while the visible knob keeps its size. */
+  .trim {
+    height: 44px;
+  }
+  .trim::before,
+  #trim-fill {
+    top: 20px;
+  }
+  #builder .trim input[type="range"] {
+    height: 44px;
+  }
+  #builder .trim input[type="range"]::-webkit-slider-thumb {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: radial-gradient(
+      circle,
+      #fff 0 6px,
+      var(--accent) 6.5px 9px,
+      transparent 9.5px
+    );
+  }
+  #builder .trim input[type="range"]::-moz-range-thumb {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: radial-gradient(
+      circle,
+      #fff 0 6px,
+      var(--accent) 6.5px 9px,
+      transparent 9.5px
+    );
+  }
 }
