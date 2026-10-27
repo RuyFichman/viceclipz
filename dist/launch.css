@@ -135,6 +135,29 @@
   flex-wrap: wrap;
   gap: 6px 14px;
 }
+.auth-box .legal-links {
+  font-size: 12px;
+}
+#main > footer > span {
+  font-size: 12px;
+  color: #9a93a6;
+}
+#main > footer > .legal-links {
+  letter-spacing: 0;
+  max-width: none;
+}
+#main > footer .legal-links a {
+  padding: 6px 0;
+}
+#metrics > .field-help {
+  margin-top: 14px;
+}
+a.phase {
+  display: block;
+}
+a.phase:hover {
+  border-color: #4a3a55;
+}
 button:disabled {
   cursor: not-allowed;
   opacity: 0.5;

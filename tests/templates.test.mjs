@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID, randomBytes } from "node:crypto";
 import { createServer } from "node:http";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import path from "node:path";
 process.env.DATA_DIR = path.resolve(
@@ -85,6 +85,7 @@ const { variationArgs, renderOverlay } =
 const { buildVariations, validateTemplate } =
   await import("../lib/template-spec.mjs");
 const core = await import("../dist/template-core.js");
+const format = await import("../dist/format.js");
 const Anthropic = (await import("@anthropic-ai/sdk")).default;
 const server = createServer(async (req, res) => {
   try {
@@ -780,6 +781,40 @@ await test("Templates: migração, validação, cotas de lote, presets salvos e 
         } finally {
           console.error = original;
         }
+      },
+    );
+    await t.test(
+      "interface: IDs únicos, números em pt-BR e uso do plano na sessão",
+      async () => {
+        // The classic editor and the builder once shared trim-start/trim-end,
+        // so the editor read and saved the builder's sliders.
+        const ids = [
+          ...readFileSync("dist/index.html", "utf8").matchAll(
+            /\sid="([^"]+)"/g,
+          ),
+        ].map((m) => m[1]);
+        const repeated = ids.filter((id, i) => ids.indexOf(id) !== i);
+        assert.deepEqual(repeated, []);
+        assert.equal(format.bytes(512), "512 B");
+        assert.equal(format.bytes(20659), "20 KB");
+        assert.equal(format.bytes(5.5 * 1024 ** 2), "5,5 MB");
+        assert.equal(format.bytes(2 * 1024 ** 3), "2 GB");
+        assert.equal(format.seconds(2.44), "2,4 s");
+        assert.equal(format.seconds(6), "6 s");
+        assert.equal(
+          format.plural(1, "exportação", "exportações"),
+          "1 exportação",
+        );
+        assert.equal(
+          format.plural(10, "exportação", "exportações"),
+          "10 exportações",
+        );
+        assert.equal(format.day("2026-10-27"), "27/10/2026");
+        const who = account("Plano");
+        const me = await call(who, "/auth/me");
+        assert.deepEqual(me.plan, { key: "free", name: "Grátis", renders: 10 });
+        assert.equal(me.rendersUsed, 0);
+        assert.equal(me.storageLimit, 2 * 1024 ** 3);
       },
     );
   } finally {

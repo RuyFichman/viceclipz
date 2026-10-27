@@ -1,3 +1,4 @@
+import { bytes, seconds, day } from "./format.js";
 const $ = (s) => document.querySelector(s);
 const el = (tag, text, cls) => {
   const e = document.createElement(tag);
@@ -46,7 +47,7 @@ const discovery = page(
   "Descobrir conteúdo",
   "Reúna referências de sites, feeds RSS/Atom, Instagram e TikTok. Cada coleta preserva a origem.",
 );
-discovery.innerHTML += `<form id="discovery-form" class="launch-card"><label for="source-url">Link público</label><div class="collect-row"><input id="source-url" type="url" required maxlength="2048" placeholder="https://…" aria-describedby="source-help"><button class="primary" type="submit">Coletar referências</button></div><p id="source-help" class="field-help">Sites: uma página ou até 20 itens de um feed. Instagram primeiro, TikTok também disponível por link completo de publicação. Sem perfis privados ou links curtos.</p><p class="field-help">Coletamos título, trecho e autoria. Para editar um vídeo, envie um arquivo que você tem autorização para usar em Meus vídeos.</p></form><p id="discovery-message" role="status"></p><div id="reference-list" class="launch-grid"></div>`;
+discovery.innerHTML += `<form id="discovery-form" class="launch-card"><label for="source-url">Link público</label><div class="collect-row"><input id="source-url" type="url" required maxlength="2048" placeholder="https://…" aria-describedby="source-help"><button class="primary" type="submit">Coletar referências</button></div><p id="source-help" class="field-help">Sites: uma página ou até 20 itens de um feed. Instagram e TikTok: link completo de uma publicação pública. Sem perfis privados ou links curtos.</p><p class="field-help">Coletamos título, trecho e autoria. Para editar um vídeo, envie à Biblioteca um arquivo que você tem autorização para usar.</p></form><p id="discovery-message" role="status"></p><div id="reference-list" class="launch-grid"></div>`;
 const metrics = page(
   "metrics",
   "Métricas do estúdio",
@@ -135,14 +136,14 @@ async function renderMetrics(ticket = generation) {
   $("#metrics-cards").replaceChildren(
     ...[
       ["Projetos", data.projects],
-      ["Vídeos", data.assets],
+      ["Arquivos na biblioteca", data.assets],
       ["Referências", data.references],
-      ["Armazenamento", (data.storageBytes / 1024 ** 2).toFixed(1) + " MB"],
+      ["Armazenamento", bytes(data.storageBytes)],
       [
         "Tempo médio de exportação",
         data.averageExportSeconds === null
           ? "Ainda sem dados"
-          : data.averageExportSeconds.toFixed(1) + " s",
+          : seconds(data.averageExportSeconds),
       ],
     ].map(([label, value]) => {
       const card = el("article", "", "launch-card");
@@ -167,11 +168,11 @@ async function renderMetrics(ticket = generation) {
   else {
     const table = el("table");
     const head = el("tr");
-    head.append(el("th", "Data (UTC)"), el("th", "Quantidade"));
+    head.append(el("th", "Dia (UTC)"), el("th", "Quantidade"));
     table.append(head);
     for (const row of data.daily) {
       const tr = el("tr");
-      tr.append(el("td", row.day), el("td", String(row.count)));
+      tr.append(el("td", day(row.day)), el("td", String(row.count)));
       table.append(tr);
     }
     detail.append(table);

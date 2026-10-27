@@ -56,6 +56,7 @@ Implementation is not evidence of external activation. Do not claim that OAuth a
 | `lib/archive.mjs` | Streamed, uncompressed ZIP of finished variations |
 | `lib/phrase-ai.mjs` | Phrase-suggestion provider adapter, output validation and monthly limits |
 | `dist/template-core.js` | Shared browser/Node limits, presets, defaults and zoom/pan placement math |
+| `dist/format.js` | pt-BR formatting of sizes, durations, counts and calendar days for every studio page |
 | `dist/templates.js`, `dist/templates.css` | Template gallery, seven-step builder, live preview and batch grid |
 | `fonts/` | SIL OFL fonts used only by the server renderer, with their licenses |
 | `tests/templates.test.mjs` | Schema upgrade, template validation, geometry, batch quotas, saved presets and mocked AI |
@@ -155,6 +156,7 @@ Use subagents only when explicitly requested by the user or permitted by higher-
 - Preserve the dark visual system, the Vice-sunset accent palette (pink, orange and violet tokens defined in `dist/styles.css` `:root`), existing typography and original ViceClipz branding. The palette is color inspiration only; do not use third-party logos, artwork or trademarks.
 - Keep navigation usable on small screens and at reduced viewport heights. Do not hide essential actions in inaccessible overflow.
 - Use semantic elements, visible labels, keyboard-accessible controls, visible focus and readable errors. Preserve `hidden`, dialog and form semantics.
+- Element IDs in `dist/index.html` must be unique (a test enforces it): the classic editor and the template builder share the page, and `document.querySelector` silently picks the first match. Format numbers and sizes with `dist/format.js`, not `toFixed`.
 - Provide honest loading, empty, unavailable and error states. Disabled integrations must explain why they are unavailable; do not simulate a successful connection or payment.
 - Display the scheduling timezone and destination account before confirmation. Do not silently switch visibility or account targets.
 - Keep prices sourced from configured billing behavior. Do not invent discounts, guarantees, provider approvals, analytics or completed publications.
