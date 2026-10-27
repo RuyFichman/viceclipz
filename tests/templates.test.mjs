@@ -809,10 +809,16 @@ await test("Templates: migração, validação, cotas de lote, presets salvos e 
           format.plural(10, "exportação", "exportações"),
           "10 exportações",
         );
+        assert.equal(format.integer(99996), "99.996");
         assert.equal(format.day("2026-10-27"), "27/10/2026");
         const who = account("Plano");
         const me = await call(who, "/auth/me");
-        assert.deepEqual(me.plan, { key: "free", name: "Grátis", renders: 10 });
+        assert.deepEqual(me.plan, {
+          key: "free",
+          name: "Grátis",
+          renders: 10,
+          social: false,
+        });
         assert.equal(me.rendersUsed, 0);
         assert.equal(me.storageLimit, 2 * 1024 ** 3);
       },

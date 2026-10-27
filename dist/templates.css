@@ -1118,3 +1118,17 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+.generate-cost {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.generate-cost a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.generate-cost.error {
+  color: #f6b0ad;
+}

@@ -38,6 +38,7 @@ PNG, JPEG e WebP são aceitos no mesmo upload de vídeos (100 MiB, cota de armaz
 ## Lotes, fila e cotas
 
 - Até 50 variações por lote. O lote é **uma operação**: o limite de duas operações ativas por conta conta exportações avulsas e lotes, não os itens.
+- Antes do botão, a etapa Gerar diz quanto o lote consome ("Este lote usa N das suas M exportações restantes neste mês") ou por que o botão está desativado (mais de 50 variações, ou cota insuficiente, com link para Seu plano). O servidor continua sendo quem confere a cota.
 - Cada item é um registro em `jobs` com `batch_id` e reserva **uma exportação** do mês no ledger existente. Falhas e cancelamentos liberam a reserva; nova tentativa reserva o mesmo item de novo (chave por job, sem contagem dupla); remover itens concluídos não devolve o uso.
 - Armazenamento: cada item reserva o tamanho máximo pelo bitrate (≈ 600 kB por segundo + 4 MiB, até 100 MiB); exportações avulsas continuam reservando 100 MiB.
 - O worker global renderiza um job por vez. A fila intercala contas (o item mais antigo de cada conta primeiro), então um lote grande não bloqueia as exportações de outras pessoas.

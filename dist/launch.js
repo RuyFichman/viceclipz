@@ -14,7 +14,14 @@ const states = {
 };
 let active = false,
   loading = false,
-  requestKey = null;
+  requestKey = null,
+  plan = null,
+  upgrade = null,
+  announce = false;
+const UPGRADES = {
+  social:
+    "Agendar publicações e conectar suas redes fazem parte dos planos Creator e Studio.",
+};
 async function api(path, method = "GET", data) {
   const res = await fetch("/api" + path, {
     method,
@@ -55,6 +62,36 @@ function action(text, fn, disabled = false) {
   };
   return b;
 }
+// Paid features are marked before the click: a lock, the plan badge and a name
+// that says which plans include them. Clicking explains it on Seu plano.
+export function lockedButton(text, reason = "social") {
+  const b = element("button", "", "secondary locked");
+  b.type = "button";
+  const lock = element("span", "", "lock-icon");
+  lock.setAttribute("aria-hidden", "true");
+  lock.innerHTML =
+    '<svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M4.5 7V5a3.5 3.5 0 0 1 7 0v2h.5A1.5 1.5 0 0 1 13.5 8.5v5A1.5 1.5 0 0 1 12 15H4a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 4 7h.5ZM6 7h4V5a2 2 0 1 0-4 0v2Z"/></svg>';
+  b.append(
+    lock,
+    text,
+    element("span", " — disponível nos planos ", "visually-hidden"),
+    element("span", "Creator", "plan-badge"),
+    element("span", " e Studio", "visually-hidden"),
+  );
+  b.onclick = () => showUpgrade(reason);
+  return b;
+}
+export function showUpgrade(reason) {
+  upgrade = reason;
+  announce = true;
+  if (location.hash === "#billing") refreshLaunch();
+  else location.hash = "billing";
+}
+export function setLaunchPlan(value) {
+  const changed = plan?.social !== value?.social;
+  plan = value;
+  if (changed) renderPublishAction();
+}
 function section(id, title, copy) {
   const s = element("section", "", "page launch-page");
   s.id = id;
@@ -84,7 +121,16 @@ const publishing = section(
   "Publicações",
   "Escolha um MP4 pronto e defina quando ele deve ir ao ar.",
 );
-publishing.append(action("＋ Agendar publicação", () => openSchedule()));
+const publishAction = element("div", "", "actions");
+publishing.append(publishAction);
+function renderPublishAction() {
+  publishAction.replaceChildren(
+    plan && !plan.social
+      ? lockedButton("Agendar publicação")
+      : action("＋ Agendar publicação", () => openSchedule()),
+  );
+}
+renderPublishAction();
 const scheduleList = element("div", "", "launch-list");
 scheduleList.id = "schedule-list";
 publishing.append(scheduleList);
@@ -94,7 +140,7 @@ const billing = section(
   "Acompanhe seu uso e gerencie sua assinatura com segurança.",
 );
 billing.innerHTML +=
-  '<div id="billing-summary" class="launch-card"></div><div id="plan-cards" class="launch-grid"></div><p class="field-help">A assinatura só libera os recursos após confirmação do Stripe. A cota de exportações renova no primeiro dia de cada mês, em UTC. Exportações concluídas contam mesmo depois de removidas.</p>';
+  '<p id="plan-notice" class="plan-notice" tabindex="-1" hidden></p><div id="billing-summary" class="launch-card"></div><div id="plan-cards" class="launch-grid"></div><p class="field-help">A assinatura só libera os recursos após confirmação do Stripe. A cota de exportações renova no primeiro dia de cada mês, em UTC. Exportações concluídas contam mesmo depois de removidas.</p>';
 const account = section(
   "account",
   "Sua conta",
@@ -125,11 +171,8 @@ export async function openSchedule(jobId) {
         c.state === "connected" &&
         info.providers.some((p) => p.provider === c.provider && p.configured),
     );
+  if (!info.enabled) return showUpgrade("social");
   if (!ready.length) throw Error("Exporte um MP4 antes de agendar.");
-  if (!info.enabled) {
-    location.hash = "billing";
-    throw Error("Escolha um plano com publicação social.");
-  }
   if (!connections.length) {
     location.hash = "integrations";
     throw Error("Conecte uma conta antes de agendar.");
@@ -226,24 +269,27 @@ async function connections() {
         !p.configured
           ? "Disponível após configuração do serviço."
           : !info.enabled
-            ? "Requer um plano com publicação social."
+            ? "Disponível nos planos Creator e Studio."
             : c?.state === "connected"
               ? "Conectada e pronta para agendar."
               : "Autorize com segurança no site da rede.",
       ),
     );
+    const label =
+      c?.state === "connected" ? "Reconectar" : "Conectar " + names[p.provider];
     card.append(
-      action(
-        c?.state === "connected"
-          ? "Reconectar"
-          : "Conectar " + names[p.provider],
-        async () => {
-          location.assign(
-            (await api("/integrations/" + p.provider + "/connect", "POST")).url,
-          );
-        },
-        !p.configured || !info.enabled,
-      ),
+      p.configured && !info.enabled
+        ? lockedButton(label)
+        : action(
+            label,
+            async () => {
+              location.assign(
+                (await api("/integrations/" + p.provider + "/connect", "POST"))
+                  .url,
+              );
+            },
+            !p.configured,
+          ),
     );
     if (c && c.state !== "disconnected")
       card.append(
@@ -348,7 +394,19 @@ async function profile() {
 }
 async function plans() {
   const info = await api("/billing"),
-    summary = $("#billing-summary");
+    summary = $("#billing-summary"),
+    notice = $("#plan-notice");
+  notice.hidden = !upgrade;
+  notice.textContent = upgrade
+    ? UPGRADES[upgrade] +
+      (info.configured
+        ? " Compare os planos abaixo."
+        : " Os planos pagos ainda não estão disponíveis para assinatura.")
+    : "";
+  if (upgrade && announce) {
+    announce = false;
+    notice.focus();
+  }
   summary.replaceChildren(
     element("p", "PLANO ATUAL", "eyebrow"),
     element("h2", info.plan.name),
@@ -448,6 +506,9 @@ export async function refreshLaunch() {
 export function setLaunchSession(value) {
   active = value;
   if (!value) {
+    plan = null;
+    upgrade = null;
+    renderPublishAction();
     dialog.close();
     message("");
     for (const id of [
@@ -474,6 +535,7 @@ export function setLaunchSession(value) {
 }
 window.addEventListener("hashchange", () => {
   message("");
+  if (location.hash !== "#billing") upgrade = null;
   refreshLaunch();
 });
 setInterval(() => {

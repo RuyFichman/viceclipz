@@ -349,3 +349,41 @@ button:disabled {
 body:has(#more-sheet[open]) {
   overflow: hidden;
 }
+/* Paid features shown before the click and the matching notice on Seu plano. */
+.secondary.locked {
+  gap: 8px;
+  border-style: dashed;
+  border-color: #5c4068;
+  color: #e9dcf0;
+}
+/* growth.css makes card buttons inline-block; keep the icon and badge aligned. */
+.launch-card > button.secondary.locked {
+  display: inline-flex;
+}
+.lock-icon {
+  display: inline-flex;
+  color: var(--violet);
+}
+.plan-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #2d1631;
+  color: #ffc4e2;
+  font-size: 12px;
+  font-weight: 650;
+}
+.plan-notice {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid #4a3357;
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: #1d1424;
+  color: #f0e3f5;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.plan-notice:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}

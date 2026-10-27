@@ -1,4 +1,9 @@
-import { openSchedule, setLaunchSession } from "./launch.js";
+import {
+  lockedButton,
+  openSchedule,
+  setLaunchPlan,
+  setLaunchSession,
+} from "./launch.js";
 import { setDiscoverySession } from "./discovery.js";
 import { setTemplateSession, useAssetInTemplate } from "./templates.js";
 import {
@@ -61,6 +66,7 @@ const labels = {
   metrics: "Métricas do estúdio",
 };
 let user = null,
+  plan = null,
   projects = [],
   assets = [],
   jobs = [],
@@ -101,6 +107,7 @@ function showAuth() {
   setDiscoverySession(false);
   setTemplateSession(null);
   user = null;
+  plan = null;
   projects = [];
   assets = [];
   jobs = [];
@@ -147,7 +154,12 @@ async function load() {
   setTemplateSession(user);
 }
 function storage(session) {
-  const { plan, rendersUsed } = session;
+  const { rendersUsed } = session,
+    changed = plan?.social !== session.plan.social;
+  plan = session.plan;
+  setLaunchPlan(plan);
+  // Scheduling buttons show the lock before the click; redraw when it changes.
+  if (changed) renderJobs();
   $("#plan-label").textContent = "Plano " + plan.name;
   $("#usage-exports").textContent =
     plan.key === "local"
@@ -368,7 +380,11 @@ function renderJobs() {
       link.href = "/api/jobs/" + j.id + "/download";
       link.download = "viceclipz.mp4";
       actions.append(link);
-      actions.append(button("Agendar", () => openSchedule(j.id)));
+      actions.append(
+        plan && !plan.social
+          ? lockedButton("Agendar")
+          : button("Agendar", () => openSchedule(j.id)),
+      );
     }
     if (["running", "queued"].includes(j.state))
       actions.append(
