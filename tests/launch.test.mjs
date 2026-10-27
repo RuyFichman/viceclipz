@@ -520,6 +520,7 @@ await test("Etapa 3: integrações, fila, cobrança e deploy", async (t) => {
         );
         const files = await readdir(path.join(output, "static"));
         assert(files.includes("launch.js"));
+        assert(files.includes("format.js"));
         for (const page of ["termos", "privacidade", "retencao", "suporte"]) {
           assert(files.includes(page + ".html"));
           assert(

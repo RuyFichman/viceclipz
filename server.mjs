@@ -17,6 +17,7 @@ const files = {
   "/launch.js": "launch.js",
   "/launch.css": "launch.css",
   "/discovery.js": "discovery.js",
+  "/format.js": "format.js",
   "/growth.css": "growth.css",
   "/templates.js": "templates.js",
   "/template-core.js": "template-core.js",

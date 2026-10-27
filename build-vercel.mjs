@@ -62,6 +62,7 @@ export async function build(destination, backend) {
     "mvp.css",
     "launch.css",
     "discovery.js",
+    "format.js",
     "growth.css",
     "landing.html",
     "templates.js",

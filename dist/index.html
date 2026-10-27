@@ -94,7 +94,7 @@
       <aside class="sidebar">
         <a href="#overview" class="brand"
           ><span class="brand-icon">v<span>c</span></span
-          >viceclipz<span class="beta">MVP</span></a
+          >viceclipz<span class="beta">BETA</span></a
         >
         <div class="workspace">
           <span class="avatar" id="user-avatar">V</span>
@@ -115,14 +115,15 @@
           ><a href="#calendar" data-nav="calendar"><span>▤</span>Calendário</a>
         </nav>
         <div class="sidebar-bottom">
-          <div class="phase">
-            <span class="live-dot"></span> Etapa 03 / 03
-            <p>Pronto para dar play.</p>
+          <a class="phase" href="#billing" aria-label="Seu plano e uso">
+            <span class="live-dot"></span>
+            <span id="plan-label">Seu plano</span>
+            <p id="usage-exports">Exportações do mês</p>
             <small id="storage-label">0 MB de 2 GB</small>
             <div class="phase-track"><i id="storage-bar"></i></div>
-          </div>
+          </a>
           <button class="secondary" id="logout">Sair da conta ↗</button>
-          <p class="field-help">Vídeos privados · MP4 real</p>
+          <p class="field-help">Seus arquivos são privados</p>
         </div>
       </aside>
       <div class="shell">
@@ -132,8 +133,7 @@
             <strong id="breadcrumb">Visão geral</strong>
           </div>
           <div class="header-actions">
-            <span class="prototype"><i></i> Creator Studio · MVP</span
-            ><button id="logout-mobile" class="secondary mobile-logout">
+            <button id="logout-mobile" class="secondary mobile-logout">
               Sair
             </button>
           </div>
@@ -193,9 +193,9 @@
                 ><small>Suas ideias, organizadas</small>
               </div>
               <div>
-                <span>Vídeos na biblioteca</span
+                <span>Arquivos na biblioteca</span
                 ><strong id="stat-assets">0</strong
-                ><small>Prontos para reutilizar</small>
+                ><small>Vídeos e imagens para reutilizar</small>
               </div>
               <div>
                 <span>MP4 prontos</span><strong id="stat-exports">0</strong
@@ -579,12 +579,12 @@
                         <i id="trim-fill"></i
                         ><input
                           type="range"
-                          id="trim-start"
+                          id="option-trim-start"
                           aria-label="Início do corte"
                           step="0.1"
                         /><input
                           type="range"
-                          id="trim-end"
+                          id="option-trim-end"
                           aria-label="Fim do corte"
                           step="0.1"
                         />
@@ -830,8 +830,8 @@
                 <p class="eyebrow">SEU CONTEÚDO, PRONTO PARA SAIR</p>
                 <h1>Exportações<span>.</span></h1>
                 <p>
-                  MP4 · H.264 · 30 fps · até 2 minutos por corte. Nenhuma
-                  cobrança neste MVP.
+                  MP4 · H.264 · 30 fps · até 2 minutos por vídeo. Cada MP4
+                  concluído conta na cota mensal do seu plano.
                 </p>
               </div>
             </div>
@@ -843,8 +843,8 @@
                 <p class="eyebrow">SUA ROTINA CRIATIVA</p>
                 <h1>Calendário editorial<span>.</span></h1>
                 <p>
-                  Projetos organizados pela data planejada. Sem publicação
-                  automática nesta etapa.
+                  Projetos organizados pela data planejada. Para publicar
+                  automaticamente, agende o MP4 em Publicações.
                 </p>
               </div>
             </div>

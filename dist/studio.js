@@ -6,6 +6,7 @@ import {
   hideVerification,
   showVerification,
 } from "./account.js";
+import { bytes, seconds, plural } from "./format.js";
 const $ = (s) => document.querySelector(s);
 // Themes of the classic headline editor, kept for projects created before templates.
 const templates = [
@@ -76,10 +77,6 @@ function toast(text) {
   clearTimeout(toast.timer);
   toast.timer = setTimeout(() => ($("#toast").hidden = true), 5000);
 }
-const bytes = (n) =>
-  n >= 1024 ** 3
-    ? (n / 1024 ** 3).toFixed(2) + " GB"
-    : (n / 1024 ** 2).toFixed(1) + " MB";
 async function request(path, { method = "GET", data, raw = false } = {}) {
   const res = await fetch("/api" + path, {
     method,
@@ -149,6 +146,12 @@ async function load() {
   setTemplateSession(user);
 }
 function storage(session) {
+  const { plan, rendersUsed } = session;
+  $("#plan-label").textContent = "Plano " + plan.name;
+  $("#usage-exports").textContent =
+    plan.key === "local"
+      ? plural(rendersUsed, "exportação", "exportações") + " este mês"
+      : `${rendersUsed} de ${plural(plan.renders, "exportação", "exportações")} este mês`;
   $("#storage-label").textContent =
     `${bytes(session.usage)} de ${bytes(session.storageLimit)}`;
   $("#storage-bar").style.width =
@@ -221,10 +224,10 @@ function projectList(target, list) {
     el.querySelector("h3").textContent = p.name;
     el.querySelector(".draft").textContent = template
       ? "Template"
-      : "Projeto clássico";
+      : "Vídeo com título";
     el.querySelector("small").textContent = template
       ? `${templateLabels[p.layout] || "Template"} · 9:16 · ${p.zones.length} ${p.zones.length === 1 ? "zona" : "zonas"} · ${p.phrases.length} ${p.phrases.length === 1 ? "frase" : "frases"}`
-      : `${p.format} · ${p.assetId ? (p.end - p.start).toFixed(1) + " s" : "Sem vídeo"}${p.date ? " · Planejado: " + new Date(p.date + "T12:00:00").toLocaleDateString("pt-BR") : ""}`;
+      : `${p.format} · ${p.assetId ? seconds(p.end - p.start) : "Sem vídeo"}${p.date ? " · Planejado: " + new Date(p.date + "T12:00:00").toLocaleDateString("pt-BR") : ""}`;
     el.querySelector(".actions").append(
       button("Editar ↗", () =>
         template ? (location.hash = "builder/" + p.id) : openEditor(p),
@@ -271,7 +274,7 @@ function renderAssets() {
     el.querySelector("h3").textContent = a.name;
     el.querySelector("small").textContent = image
       ? `Imagem · ${a.width} × ${a.height} · ${bytes(a.size)}`
-      : `${a.duration.toFixed(1)} s · ${a.width} × ${a.height} · ${bytes(a.size)}`;
+      : `${seconds(a.duration)} · ${a.width} × ${a.height} · ${bytes(a.size)}`;
     el.querySelector(".actions").append(
       button("Usar em template ↗", () => useAssetInTemplate(a)),
       button(
@@ -307,7 +310,7 @@ function renderJobs() {
     empty(
       target,
       "Suas próximas exportações vão aparecer aqui.",
-      "Abra um projeto com vídeo e clique em Exportar MP4.",
+      "Gere variações em um template ou exporte um projeto com vídeo.",
     );
     return;
   }
@@ -381,7 +384,8 @@ function stats() {
     ["queued", "running", "cancelling"].includes(j.state),
   ).length;
   $("#stat-active").textContent = active;
-  $("#job-count").textContent = active;
+  // Same number the Exportações page lists, so the badge never contradicts it.
+  $("#job-count").textContent = jobs.length;
 }
 function render() {
   const q = $("#search").value.toLocaleLowerCase("pt-BR");
@@ -488,7 +492,7 @@ function selectAsset(reset = true) {
     video.hidden = false;
     $("#no-video").hidden = true;
     $("#upload-status").textContent =
-      `${a.name} · ${a.duration.toFixed(2)} s · ${bytes(a.size)} · salvo na biblioteca`;
+      `${a.name} · ${seconds(a.duration, 2)} · ${bytes(a.size)} · salvo na biblioteca`;
   } else {
     video.removeAttribute("src");
     video.load();
@@ -617,7 +621,7 @@ async function uploadFile(file, status, intoEditor = false) {
     );
     if (intoEditor && a.kind === "image")
       throw new Error(
-        "Projetos clássicos usam vídeos. A imagem foi salva na biblioteca.",
+        "Este editor usa apenas vídeos. A imagem foi salva na biblioteca.",
       );
     assets.unshift(a);
     status.textContent =

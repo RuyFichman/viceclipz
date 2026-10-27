@@ -1,4 +1,5 @@
 import { openAccountDeletion } from "./account.js";
+import { bytes, plural } from "./format.js";
 const $ = (s) => document.querySelector(s);
 const names = { instagram: "Instagram", youtube: "YouTube" };
 const states = {
@@ -362,9 +363,10 @@ async function plans() {
     element("h2", info.plan.name),
     element(
       "p",
-      info.used +
-        " exportações usadas neste mês" +
-        (info.plan.key === "local" ? "" : " de " + info.plan.renders),
+      info.plan.key === "local"
+        ? plural(info.used, "exportação usada", "exportações usadas") +
+            " este mês"
+        : `${info.used} de ${plural(info.plan.renders, "exportação usada", "exportações usadas")} este mês`,
     ),
     element(
       "small",
@@ -397,17 +399,15 @@ async function plans() {
     const card = element("article", "", "launch-card");
     card.append(
       element("h2", p.name),
-      element(
-        "p",
-        p.key === "free"
-          ? "Sem cobrança"
-          : p.price
-            ? priceText(p.price)
-            : "Preço exibido no checkout",
-        "plan-price",
-      ),
-      element("p", p.renders + " exportações / mês"),
-      element("p", p.storage / 1024 ** 3 + " GB para seus arquivos"),
+      p.key === "free" || p.price
+        ? element(
+            "p",
+            p.price ? priceText(p.price) : "Sem cobrança",
+            "plan-price",
+          )
+        : element("small", "O preço aparece no checkout seguro do Stripe."),
+      element("p", plural(p.renders, "exportação", "exportações") + " / mês"),
+      element("p", bytes(p.storage) + " para seus arquivos"),
       element(
         "p",
         p.social

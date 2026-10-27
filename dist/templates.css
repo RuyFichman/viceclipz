@@ -493,6 +493,14 @@
   font-size: 12px;
   line-height: 1.6;
 }
+/* The empty message spans the whole grid instead of one 130px cell. */
+.media-grid .list-empty {
+  grid-column: 1 / -1;
+}
+/* The global .field-help pulls itself up by 10px, onto the button above. */
+#zone-add + .field-help {
+  margin-top: 14px;
+}
 .danger-text {
   color: #e6a1ad;
   margin: 0;

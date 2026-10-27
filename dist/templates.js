@@ -13,6 +13,7 @@ import {
   variationCount,
   placement,
 } from "./template-core.js";
+import { bytes } from "./format.js";
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 function el(tag, props = {}, ...children) {
@@ -127,10 +128,6 @@ let previewTimer,
 const assetById = (id) => state.assets.find((a) => a.id === id);
 const media = (slotId) => state.template.media[slotId] || [];
 const fmt = (n) => Number(n).toFixed(1).replace(".", ",");
-const bytes = (n) =>
-  n >= 1024 ** 3
-    ? (n / 1024 ** 3).toFixed(2) + " GB"
-    : (n / 1024 ** 2).toFixed(1) + " MB";
 function notifyProjects() {
   window.dispatchEvent(new Event("viceclipz:projects-changed"));
 }
@@ -1403,12 +1400,12 @@ function renderOptionEditor(slot) {
   $("#trim-box").hidden = slot.type !== "video";
   if (slot.type === "video") {
     const duration = asset?.duration || option.end;
-    for (const id of ["#trim-start", "#trim-end"]) {
+    for (const id of ["#option-trim-start", "#option-trim-end"]) {
       $(id).min = "0";
       $(id).max = String(duration);
     }
-    $("#trim-start").value = String(option.start);
-    $("#trim-end").value = String(option.end);
+    $("#option-trim-start").value = String(option.start);
+    $("#option-trim-end").value = String(option.end);
     updateTrim(duration);
   }
   for (const input of $$("[data-option]"))
@@ -1428,8 +1425,8 @@ function onTrim(which) {
     asset = option && assetById(option.assetId);
   if (!option || !asset) return;
   const duration = asset.duration;
-  let start = Number($("#trim-start").value),
-    end = Number($("#trim-end").value);
+  let start = Number($("#option-trim-start").value),
+    end = Number($("#option-trim-end").value);
   if (which === "start") {
     start = Math.min(start, end - 0.25);
     if (end - start > 120) end = start + 120;
@@ -1442,8 +1439,8 @@ function onTrim(which) {
     Math.floor(duration * 100) / 100,
     Math.round(end * 100) / 100,
   );
-  $("#trim-start").value = String(option.start);
-  $("#trim-end").value = String(option.end);
+  $("#option-trim-start").value = String(option.start);
+  $("#option-trim-end").value = String(option.end);
   updateTrim(duration);
   const label = $(`[data-trim-label="${option.id}"]`);
   if (label)
@@ -1454,8 +1451,8 @@ function onTrim(which) {
     video.currentTime = which === "start" ? option.start : option.end;
   renderGenerateSummary();
 }
-$("#trim-start").addEventListener("input", () => onTrim("start"));
-$("#trim-end").addEventListener("input", () => onTrim("end"));
+$("#option-trim-start").addEventListener("input", () => onTrim("start"));
+$("#option-trim-end").addEventListener("input", () => onTrim("end"));
 $("#media-center").onclick = () => {
   const option = currentOption();
   if (!option) return;
