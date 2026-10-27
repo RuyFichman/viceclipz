@@ -34,12 +34,8 @@ function page(id, title, copy) {
   );
   heading.append(wrap);
   s.append(heading);
+  // The sidebar link for this page lives in its group in index.html.
   $("#main").insertBefore(s, $("#main footer"));
-  const link = el("a", title);
-  link.href = "#" + id;
-  link.dataset.nav = id;
-  link.prepend(el("span", id === "discovery" ? "⌕" : "▥"));
-  $('nav[aria-label="Navegação principal"]').append(link);
   return s;
 }
 const discovery = page(

@@ -107,6 +107,7 @@ function showAuth() {
   $("#app").hidden = true;
   $("#auth-screen").hidden = false;
   $("#editor").close();
+  $("#more-sheet").close();
   $("#auth-password").value = "";
 }
 function setGlobalError(message = "") {
@@ -169,8 +170,38 @@ function route() {
     if (el.dataset.nav === nav) el.setAttribute("aria-current", "page");
     else el.removeAttribute("aria-current");
   });
+  // Pages without a shortcut in the phone tab bar live under "Mais".
+  const more = !$(`.tabbar [data-nav="${nav}"]`);
+  $("#more-button").classList.toggle("active", more);
+  $("#more-current").textContent = more
+    ? ", página atual: " + labels[page]
+    : "";
+  $("#breadcrumb-group").textContent = $(`.side-nav [data-nav="${nav}"]`)
+    .closest(".nav-group")
+    .querySelector(".nav-label").textContent;
   $("#breadcrumb").textContent = labels[page];
+  if ($("#more-sheet").open) $("#more-sheet").close();
 }
+// On phones the sidebar moves into the "Mais" sheet while it is open, so its
+// links, plan card and logout button exist only once in the page.
+function openMore() {
+  $("#more-sheet .sheet-body").append($(".sidebar"));
+  $("#more-sheet").showModal();
+  $("#more-button").setAttribute("aria-expanded", "true");
+}
+$("#more-button").onclick = openMore;
+$("#more-close").onclick = () => $("#more-sheet").close();
+$("#more-sheet").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.close();
+});
+$("#more-sheet").addEventListener("close", () => {
+  $("#app").prepend($(".sidebar"));
+  $("#more-button").setAttribute("aria-expanded", "false");
+  $("#more-button").focus();
+});
+matchMedia("(min-width: 801px)").addEventListener("change", (e) => {
+  if (e.matches && $("#more-sheet").open) $("#more-sheet").close();
+});
 function empty(el, title, copy) {
   el.innerHTML = '<div class="empty simple"><h3></h3><p></p></div>';
   el.querySelector("h3").textContent = title;
@@ -720,7 +751,7 @@ $("#auth-form").onsubmit = async (e) => {
     $("#auth-submit").disabled = false;
   }
 };
-$("#logout-mobile").onclick = $("#logout").onclick = async () => {
+$("#logout").onclick = async () => {
   try {
     await request("/auth/logout", { method: "POST" });
     showAuth();

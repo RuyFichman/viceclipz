@@ -68,17 +68,8 @@ function section(id, title, copy) {
   );
   heading.append(text);
   s.append(heading);
+  // The sidebar link for this page lives in its group in index.html.
   $("#main").insertBefore(s, $("#main footer"));
-  const a = element("a", title);
-  a.prepend(
-    element(
-      "span",
-      { integrations: "◎", publishing: "↗", billing: "◇", account: "◉" }[id],
-    ),
-  );
-  a.href = "#" + id;
-  a.dataset.nav = id;
-  $('nav[aria-label="Navegação principal"]').append(a);
   return s;
 }
 const integrations = section(

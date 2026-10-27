@@ -67,7 +67,7 @@ Implementation is not evidence of external activation. Do not claim that OAuth a
 | `lib/scheduler.mjs` | Publication state transitions and restart recovery |
 | `lib/billing.mjs` | Stripe checkout, portal, webhook ingestion and reconciliation |
 | `lib/server-lock.mjs` | Single-server lock for a data directory |
-| `dist/index.html` | Application markup |
+| `dist/index.html` | Application markup, including the grouped sidebar navigation, the phone tab bar and the "Mais" sheet |
 | `dist/studio.js` | Authentication, projects, editor, uploads and exports UI |
 | `dist/launch.js` | Connections, publication scheduling and plans UI |
 | `dist/account.js` | Verification gate, email-link handling and password recovery UI |
@@ -155,6 +155,7 @@ Use subagents only when explicitly requested by the user or permitted by higher-
 - Product copy is Brazilian Portuguese unless the user requests otherwise. Keep this agent guide in English. Respond to the user in their chosen language.
 - Preserve the dark visual system, the Vice-sunset accent palette (pink, orange and violet tokens defined in `dist/styles.css` `:root`), existing typography and original ViceClipz branding. The palette is color inspiration only; do not use third-party logos, artwork or trademarks.
 - Keep navigation usable on small screens and at reduced viewport heights. Do not hide essential actions in inaccessible overflow.
+- Every studio page has one static link in its sidebar group in `dist/index.html` (Criar, Publicar, Ideias, Conta) and a label in `labels` in `dist/studio.js`; modules create page sections but never navigation links. At 800 px and below the sidebar is hidden: the bottom tab bar holds four shortcuts and "Mais" moves the sidebar into the `#more-sheet` dialog while it is open, so navigation IDs stay unique.
 - Use semantic elements, visible labels, keyboard-accessible controls, visible focus and readable errors. Preserve `hidden`, dialog and form semantics.
 - Element IDs in `dist/index.html` must be unique (a test enforces it): the classic editor and the template builder share the page, and `document.querySelector` silently picks the first match. Format numbers and sizes with `dist/format.js`, not `toFixed`.
 - Provide honest loading, empty, unavailable and error states. Disabled integrations must explain why they are unavailable; do not simulate a successful connection or payment.

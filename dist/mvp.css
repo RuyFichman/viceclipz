@@ -410,15 +410,6 @@ select:disabled {
   .auth-box h2 {
     font-size: 26px;
   }
-  .sidebar-bottom {
-    display: none;
-  }
-  .sidebar .workspace {
-    display: none;
-  }
-  nav {
-    padding-bottom: 4px;
-  }
   .project-row .actions {
     width: 100%;
     margin: 6px 0 0;
@@ -471,25 +462,4 @@ select:disabled {
 .composition {
   width: min(100%, calc(46vh * var(--ratio, 0.5625)));
   max-width: 300px;
-}
-.mobile-logout {
-  display: none;
-}
-@media (max-width: 800px) {
-  .mobile-logout {
-    display: inline-flex;
-    padding: 7px 10px;
-    margin-left: 8px;
-    font-size: 10px;
-  }
-  .header-actions {
-    display: flex;
-    align-items: center;
-  }
-  .sidebar nav {
-    gap: 1px;
-  }
-  .sidebar nav a {
-    padding: 9px;
-  }
 }

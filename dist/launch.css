@@ -162,22 +162,190 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
+/* Sidebar groups (Criar, Publicar, Ideias, Conta). */
+:root {
+  --tabbar-height: 68px;
+}
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 0 auto;
+}
+.nav-group {
+  display: grid;
+  gap: 2px;
+}
+.nav-group .nav-label {
+  text-transform: uppercase;
+  margin: 0 12px 2px;
+}
+.nav-account {
+  margin-top: auto;
+  padding-top: 4px;
+}
+.sidebar .side-nav a {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  line-height: 20px;
+}
+.sidebar .side-nav a > span {
+  font-size: 16px;
+  line-height: 20px;
+  width: 18px;
+  text-align: center;
+}
+.breadcrumb #breadcrumb-group {
+  padding: 0;
+}
+.header-brand,
+.tabbar {
+  display: none;
+}
 @media (min-width: 801px) {
   .sidebar {
     overflow-y: auto;
-    padding-bottom: 16px;
-  }
-  .sidebar nav {
-    gap: 2px;
-  }
-  .sidebar nav a {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 24px;
+    padding-bottom: 12px;
   }
   .sidebar .workspace {
-    margin: 24px 0 20px;
+    margin: 16px 0 14px;
+    padding: 8px 9px;
   }
   .sidebar-bottom {
-    padding-top: 22px;
+    padding-top: 12px;
   }
+  .sidebar .phase {
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .sidebar .phase p {
+    margin: 8px 0 2px;
+  }
+  .sidebar .phase-track {
+    margin-top: 8px;
+  }
+  .sidebar-bottom > .field-help {
+    margin: 0;
+  }
+}
+/* Phones: the sidebar is hidden; a bottom tab bar and the "Mais" sheet replace it. */
+@media (max-width: 800px) {
+  #app > .sidebar {
+    display: none;
+  }
+  .header-brand {
+    display: flex;
+    font-size: 20px;
+  }
+  .header-brand span {
+    color: var(--accent);
+    font-size: 16px;
+  }
+  header {
+    gap: 16px;
+  }
+  .breadcrumb {
+    text-align: right;
+  }
+  .tabbar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    margin: 0;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    background: #130f18;
+    border-top: 1px solid var(--line);
+  }
+  .tabbar a,
+  .tabbar button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 52px;
+    padding: 6px 2px;
+    border-radius: 10px;
+    background: none;
+    color: #b8b2c2;
+    font-size: 12px;
+    font-weight: 550;
+  }
+  .tabbar a > span,
+  .tabbar button > span[aria-hidden] {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .tabbar a:hover,
+  .tabbar button:hover {
+    background: #201a27;
+  }
+  .tabbar .active,
+  .tabbar .active:hover {
+    color: var(--accent);
+    background: #2d1631;
+  }
+  main {
+    padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+  }
+  .toast {
+    bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 12px);
+  }
+  .builder-footer {
+    bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+  }
+}
+#more-sheet {
+  width: 100%;
+  max-width: none;
+  margin: auto 0 0;
+  padding: 0;
+  max-height: 88vh;
+  max-height: 88dvh;
+  overflow: auto;
+  border-width: 1px 0 0;
+  border-radius: 18px 18px 0 0;
+}
+.sheet-body {
+  padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.sheet-head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+#more-sheet .sidebar {
+  position: static;
+  display: block;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+#more-sheet .sidebar > .brand {
+  display: none;
+}
+#more-sheet .workspace {
+  margin: 0 0 18px;
+}
+#more-sheet .side-nav a {
+  min-height: 44px;
+  font-size: 14px;
+}
+#more-sheet .sidebar-bottom {
+  padding-top: 18px;
+}
+body:has(#more-sheet[open]) {
+  overflow: hidden;
 }
