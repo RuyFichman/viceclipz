@@ -470,6 +470,76 @@ await test("Etapa 3: integrações, fila, cobrança e deploy", async (t) => {
       },
     );
     await t.test(
+      "plano grátis: /auth/me antecipa o bloqueio social e a API continua recusando",
+      async () => {
+        const free = randomUUID(),
+          freeJob = randomUUID(),
+          freeConnection = randomUUID();
+        run(
+          "INSERT INTO users VALUES(?,?,?,?,?)",
+          free,
+          free + "@example.test",
+          "Plano grátis",
+          "not-a-login-hash",
+          now,
+        );
+        run("INSERT INTO projects VALUES(?,?,?,?,?)", free, free, "{}", 1, now);
+        run(
+          "INSERT INTO jobs(id,user_id,project_id,fingerprint,snapshot,state,created,updated) VALUES(?,?,?,?,?,'done',?,?)",
+          freeJob,
+          free,
+          free,
+          "fixture-free",
+          JSON.stringify({ name: "Vídeo", format: "9:16", start: 0, end: 8 }),
+          now,
+          now,
+        );
+        run(
+          "INSERT INTO social_connections VALUES(?,?,?,?,?,?,?,'connected',?)",
+          freeConnection,
+          free,
+          "instagram",
+          "remote-free",
+          "Conta grátis",
+          store.seal({ access_token: "fixture-free-token" }),
+          now + 864000000,
+          now,
+        );
+        const auth = session(free);
+        // Without billing enforcement the local plan includes social publishing.
+        assert.equal((await call("/auth/me", { auth })).plan.social, true);
+        process.env.BILLING_REQUIRED = "true";
+        try {
+          const me = await call("/auth/me", { auth });
+          assert.deepEqual(me.plan, {
+            key: "free",
+            name: "Grátis",
+            renders: 10,
+            social: false,
+          });
+          assert.equal((await call("/integrations", { auth })).enabled, false);
+          await call("/integrations/instagram/connect", {
+            method: "POST",
+            auth,
+            expected: 403,
+          });
+          await call("/schedules", {
+            method: "POST",
+            auth,
+            data: post({ jobId: freeJob, connectionId: freeConnection }),
+            expected: 403,
+          });
+          assert.equal(
+            one("SELECT count(*) n FROM scheduled_posts WHERE user_id=?", free)
+              .n,
+            0,
+          );
+        } finally {
+          process.env.BILLING_REQUIRED = "false";
+        }
+      },
+    );
+    await t.test(
       "adaptador Instagram envia o MP4 assinado e usa container para publicar",
       async () => {
         const original = globalThis.fetch,

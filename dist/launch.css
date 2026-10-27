@@ -162,22 +162,441 @@ button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
+/* Sidebar groups (Criar, Publicar, Ideias, Conta). */
+:root {
+  --tabbar-height: 68px;
+}
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 0 auto;
+}
+.nav-group {
+  display: grid;
+  gap: 2px;
+}
+.nav-group .nav-label {
+  text-transform: uppercase;
+  margin: 0 12px 2px;
+}
+.nav-account {
+  margin-top: auto;
+  padding-top: 4px;
+}
+.sidebar .side-nav a {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  line-height: 20px;
+}
+.sidebar .side-nav a > span {
+  font-size: 16px;
+  line-height: 20px;
+  width: 18px;
+  text-align: center;
+}
+.breadcrumb #breadcrumb-group {
+  padding: 0;
+}
+.header-brand,
+.tabbar {
+  display: none;
+}
 @media (min-width: 801px) {
   .sidebar {
     overflow-y: auto;
-    padding-bottom: 16px;
-  }
-  .sidebar nav {
-    gap: 2px;
-  }
-  .sidebar nav a {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 24px;
+    padding-bottom: 12px;
   }
   .sidebar .workspace {
-    margin: 24px 0 20px;
+    margin: 16px 0 14px;
+    padding: 8px 9px;
   }
   .sidebar-bottom {
-    padding-top: 22px;
+    padding-top: 12px;
+  }
+  .sidebar .phase {
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .sidebar .phase p {
+    margin: 8px 0 2px;
+  }
+  .sidebar .phase-track {
+    margin-top: 8px;
+  }
+  .sidebar-bottom > .field-help {
+    margin: 0;
+  }
+}
+/* Phones: the sidebar is hidden; a bottom tab bar and the "Mais" sheet replace it. */
+@media (max-width: 800px) {
+  #app > .sidebar {
+    display: none;
+  }
+  .header-brand {
+    display: flex;
+    font-size: 20px;
+  }
+  .header-brand span {
+    color: var(--accent);
+    font-size: 16px;
+  }
+  header {
+    gap: 16px;
+  }
+  .breadcrumb {
+    text-align: right;
+  }
+  .tabbar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 50;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    margin: 0;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    background: #130f18;
+    border-top: 1px solid var(--line);
+  }
+  .tabbar a,
+  .tabbar button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 52px;
+    padding: 6px 2px;
+    border-radius: 10px;
+    background: none;
+    color: #b8b2c2;
+    font-size: 12px;
+    font-weight: 550;
+  }
+  .tabbar a > span,
+  .tabbar button > span[aria-hidden] {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .tabbar a:hover,
+  .tabbar button:hover {
+    background: #201a27;
+  }
+  .tabbar .active,
+  .tabbar .active:hover {
+    color: var(--accent);
+    background: #2d1631;
+  }
+  main {
+    padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+  }
+  .toast {
+    bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 12px);
+  }
+  /* templates.css loads later and pins the footer to bottom: 0 below 560 px. */
+  #builder .builder-footer {
+    bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+  }
+}
+#more-sheet {
+  width: 100%;
+  max-width: none;
+  margin: auto 0 0;
+  padding: 0;
+  max-height: 88vh;
+  max-height: 88dvh;
+  overflow: auto;
+  border-width: 1px 0 0;
+  border-radius: 18px 18px 0 0;
+}
+.sheet-body {
+  padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.sheet-head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+#more-sheet .sidebar {
+  position: static;
+  display: block;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+#more-sheet .sidebar > .brand {
+  display: none;
+}
+#more-sheet .workspace {
+  margin: 0 0 18px;
+}
+#more-sheet .side-nav a {
+  min-height: 44px;
+  font-size: 14px;
+}
+#more-sheet .sidebar-bottom {
+  padding-top: 18px;
+}
+body:has(#more-sheet[open]) {
+  overflow: hidden;
+}
+/* Paid features shown before the click and the matching notice on Seu plano. */
+.secondary.locked {
+  gap: 8px;
+  border-style: dashed;
+  border-color: #5c4068;
+  color: #e9dcf0;
+}
+/* growth.css makes card buttons inline-block; keep the icon and badge aligned. */
+.launch-card > button.secondary.locked {
+  display: inline-flex;
+}
+.lock-icon {
+  display: inline-flex;
+  color: var(--violet);
+}
+.plan-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #2d1631;
+  color: #ffc4e2;
+  font-size: 12px;
+  font-weight: 650;
+}
+.plan-notice {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid #4a3357;
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: #1d1424;
+  color: #f0e3f5;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.plan-notice:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+/* Seu plano: usage summary and comparable plan cards. */
+.plan-summary {
+  gap: 20px;
+}
+.plan-summary-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.plan-summary-head .eyebrow {
+  margin-bottom: 8px;
+}
+.plan-summary h2 {
+  font-size: 26px;
+}
+.plan-status {
+  margin-top: 6px;
+  color: #ded5e6;
+}
+.plan-meters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px 32px;
+}
+.plan-meter > p {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: 0 0 8px;
+  color: #cfc8d8;
+}
+.plan-meter strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.meter {
+  height: 8px;
+  border-radius: 999px;
+  background: #352a3d;
+  overflow: hidden;
+}
+.meter i {
+  display: block;
+  height: 100%;
+  background: var(--sunset);
+}
+.meter.full i {
+  background: var(--orange);
+}
+.plan-meter small {
+  margin-top: 6px;
+}
+.plans-title {
+  margin: 34px 0 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+.plan-card.recommended {
+  border-color: #6b3a6e;
+}
+.plan-card.current {
+  border-color: var(--accent);
+}
+.plan-cards {
+  align-items: stretch;
+  margin-top: 30px;
+  row-gap: 30px;
+}
+.plan-card {
+  position: relative;
+}
+/* The flag sits on the top border so every card's name and price line up. */
+.plan-flag {
+  position: absolute;
+  top: -13px;
+  left: 22px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #2d1631;
+  color: #ffc4e2;
+  font-size: 12px;
+  font-weight: 650;
+}
+.plan-card.current .plan-flag {
+  background: var(--sunset);
+  color: var(--ink);
+}
+.plan-card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+.plan-features {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.plan-features li {
+  display: flex;
+  gap: 10px;
+  line-height: 1.5;
+}
+.plan-features li > span {
+  flex: none;
+  width: 14px;
+  color: var(--accent);
+}
+.plan-features li.no {
+  color: #a29bae;
+}
+.plan-features li.no > span {
+  color: #8a8396;
+}
+.plan-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  margin-top: auto;
+  padding-top: 6px;
+}
+/* Target sizes: at least 24 px everywhere (WCAG 2.5.8) and 44 px on touch screens.
+   Links inside running text are exempt; standalone links get a taller box. */
+.legal-links a,
+#account .launch-card p > a,
+footer .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+.switch,
+.check-label,
+.phrase-pick,
+.check-list label {
+  min-height: 24px;
+}
+@media (max-width: 800px), (pointer: coarse) {
+  button,
+  select,
+  input:not([type="checkbox"], [type="radio"], [type="range"]),
+  .primary,
+  .secondary,
+  .light,
+  .danger,
+  .text-button,
+  .legal-links a,
+  .section-heading a,
+  footer .brand,
+  .header-brand,
+  .auth-story > .brand,
+  #account .launch-card p > a,
+  #builder input[type="range"] {
+    min-height: 44px;
+  }
+  .text-button,
+  .legal-links a {
+    min-width: 44px;
+  }
+  .download-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .icon-button,
+  .swatch {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .switch,
+  .check-label,
+  .phrase-pick,
+  .check-list label {
+    min-height: 44px;
+  }
+  /* Dual trim slider: only the thumbs take pointer events, so they get the
+     44 px hit area while the visible knob keeps its size. */
+  .trim {
+    height: 44px;
+  }
+  .trim::before,
+  #trim-fill {
+    top: 20px;
+  }
+  #builder .trim input[type="range"] {
+    height: 44px;
+  }
+  #builder .trim input[type="range"]::-webkit-slider-thumb {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: radial-gradient(
+      circle,
+      #fff 0 6px,
+      var(--accent) 6.5px 9px,
+      transparent 9.5px
+    );
+  }
+  #builder .trim input[type="range"]::-moz-range-thumb {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: radial-gradient(
+      circle,
+      #fff 0 6px,
+      var(--accent) 6.5px 9px,
+      transparent 9.5px
+    );
   }
 }

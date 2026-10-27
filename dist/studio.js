@@ -1,4 +1,9 @@
-import { openSchedule, setLaunchSession } from "./launch.js";
+import {
+  lockedButton,
+  openSchedule,
+  setLaunchPlan,
+  setLaunchSession,
+} from "./launch.js";
 import { setDiscoverySession } from "./discovery.js";
 import { setTemplateSession, useAssetInTemplate } from "./templates.js";
 import {
@@ -61,6 +66,7 @@ const labels = {
   metrics: "Métricas do estúdio",
 };
 let user = null,
+  plan = null,
   projects = [],
   assets = [],
   jobs = [],
@@ -101,12 +107,14 @@ function showAuth() {
   setDiscoverySession(false);
   setTemplateSession(null);
   user = null;
+  plan = null;
   projects = [];
   assets = [];
   jobs = [];
   $("#app").hidden = true;
   $("#auth-screen").hidden = false;
   $("#editor").close();
+  $("#more-sheet").close();
   $("#auth-password").value = "";
 }
 function setGlobalError(message = "") {
@@ -146,7 +154,14 @@ async function load() {
   setTemplateSession(user);
 }
 function storage(session) {
-  const { plan, rendersUsed } = session;
+  const { rendersUsed } = session,
+    changed = plan?.social !== session.plan.social;
+  plan = session.plan;
+  setLaunchPlan(plan);
+  // Scheduling buttons show the lock before the click; redraw when it changes.
+  // Only an explicit social: false locks, so a frontend deployed ahead of its
+  // backend (no plan.social yet) keeps working for paying accounts.
+  if (changed) renderJobs();
   $("#plan-label").textContent = "Plano " + plan.name;
   $("#usage-exports").textContent =
     plan.key === "local"
@@ -169,8 +184,38 @@ function route() {
     if (el.dataset.nav === nav) el.setAttribute("aria-current", "page");
     else el.removeAttribute("aria-current");
   });
+  // Pages without a shortcut in the phone tab bar live under "Mais".
+  const more = !$(`.tabbar [data-nav="${nav}"]`);
+  $("#more-button").classList.toggle("active", more);
+  $("#more-current").textContent = more
+    ? ", página atual: " + labels[page]
+    : "";
+  $("#breadcrumb-group").textContent = $(`.side-nav [data-nav="${nav}"]`)
+    .closest(".nav-group")
+    .querySelector(".nav-label").textContent;
   $("#breadcrumb").textContent = labels[page];
+  if ($("#more-sheet").open) $("#more-sheet").close();
 }
+// On phones the sidebar moves into the "Mais" sheet while it is open, so its
+// links, plan card and logout button exist only once in the page.
+function openMore() {
+  $("#more-sheet .sheet-body").append($(".sidebar"));
+  $("#more-sheet").showModal();
+  $("#more-button").setAttribute("aria-expanded", "true");
+}
+$("#more-button").onclick = openMore;
+$("#more-close").onclick = () => $("#more-sheet").close();
+$("#more-sheet").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.close();
+});
+$("#more-sheet").addEventListener("close", () => {
+  $("#app").prepend($(".sidebar"));
+  $("#more-button").setAttribute("aria-expanded", "false");
+  $("#more-button").focus();
+});
+matchMedia("(min-width: 801px)").addEventListener("change", (e) => {
+  if (e.matches && $("#more-sheet").open) $("#more-sheet").close();
+});
 function empty(el, title, copy) {
   el.innerHTML = '<div class="empty simple"><h3></h3><p></p></div>';
   el.querySelector("h3").textContent = title;
@@ -337,7 +382,11 @@ function renderJobs() {
       link.href = "/api/jobs/" + j.id + "/download";
       link.download = "viceclipz.mp4";
       actions.append(link);
-      actions.append(button("Agendar", () => openSchedule(j.id)));
+      actions.append(
+        plan?.social === false
+          ? lockedButton("Agendar")
+          : button("Agendar", () => openSchedule(j.id)),
+      );
     }
     if (["running", "queued"].includes(j.state))
       actions.append(
@@ -720,7 +769,7 @@ $("#auth-form").onsubmit = async (e) => {
     $("#auth-submit").disabled = false;
   }
 };
-$("#logout-mobile").onclick = $("#logout").onclick = async () => {
+$("#logout").onclick = async () => {
   try {
     await request("/auth/logout", { method: "POST" });
     showAuth();

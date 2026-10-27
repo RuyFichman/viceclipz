@@ -103,16 +103,54 @@
             ><small>Creator studio</small>
           </div>
         </div>
-        <p class="nav-label">WORKSPACE</p>
-        <nav aria-label="Navegação principal">
-          <a href="#overview" data-nav="overview"><span>◫</span>Visão geral</a
-          ><a href="#projects" data-nav="projects"
-            ><span>▱</span>Meus projetos <b id="project-count">0</b></a
-          ><a href="#templates" data-nav="templates"><span>▦</span>Templates</a
-          ><a href="#library" data-nav="library"><span>▣</span>Biblioteca</a
-          ><a href="#exports" data-nav="exports"
-            ><span>↓</span>Exportações <b id="job-count">0</b></a
-          ><a href="#calendar" data-nav="calendar"><span>▤</span>Calendário</a>
+        <!-- Every studio page has its link here, in its group. A new page also needs a label in studio.js. -->
+        <nav aria-label="Navegação principal" class="side-nav">
+          <div class="nav-group" role="group" aria-labelledby="nav-create">
+            <p class="nav-label" id="nav-create">Criar</p>
+            <a href="#overview" data-nav="overview"
+              ><span aria-hidden="true">◫</span>Visão geral</a
+            ><a href="#projects" data-nav="projects"
+              ><span aria-hidden="true">▱</span>Meus projetos
+              <b id="project-count">0</b></a
+            ><a href="#templates" data-nav="templates"
+              ><span aria-hidden="true">▦</span>Templates</a
+            ><a href="#library" data-nav="library"
+              ><span aria-hidden="true">▣</span>Biblioteca</a
+            ><a href="#exports" data-nav="exports"
+              ><span aria-hidden="true">↓</span>Exportações
+              <b id="job-count">0</b></a
+            >
+          </div>
+          <div class="nav-group" role="group" aria-labelledby="nav-publish">
+            <p class="nav-label" id="nav-publish">Publicar</p>
+            <a href="#publishing" data-nav="publishing"
+              ><span aria-hidden="true">↗</span>Publicações</a
+            ><a href="#calendar" data-nav="calendar"
+              ><span aria-hidden="true">▤</span>Calendário</a
+            ><a href="#integrations" data-nav="integrations"
+              ><span aria-hidden="true">◎</span>Contas conectadas</a
+            >
+          </div>
+          <div class="nav-group" role="group" aria-labelledby="nav-ideas">
+            <p class="nav-label" id="nav-ideas">Ideias</p>
+            <a href="#discovery" data-nav="discovery"
+              ><span aria-hidden="true">⌕</span>Descobrir conteúdo</a
+            ><a href="#metrics" data-nav="metrics"
+              ><span aria-hidden="true">▥</span>Métricas do estúdio</a
+            >
+          </div>
+          <div
+            class="nav-group nav-account"
+            role="group"
+            aria-labelledby="nav-account"
+          >
+            <p class="nav-label" id="nav-account">Conta</p>
+            <a href="#billing" data-nav="billing"
+              ><span aria-hidden="true">◇</span>Seu plano</a
+            ><a href="#account" data-nav="account"
+              ><span aria-hidden="true">◉</span>Sua conta</a
+            >
+          </div>
         </nav>
         <div class="sidebar-bottom">
           <a class="phase" href="#billing" aria-label="Seu plano e uso">
@@ -128,14 +166,13 @@
       </aside>
       <div class="shell">
         <header>
+          <a href="#overview" class="brand header-brand"
+            >viceclipz <span aria-hidden="true">✦</span></a
+          >
           <div class="breadcrumb">
-            Workspace <span>/</span>
+            <span id="breadcrumb-group">Criar</span>
+            <span class="breadcrumb-sep" aria-hidden="true">/</span>
             <strong id="breadcrumb">Visão geral</strong>
-          </div>
-          <div class="header-actions">
-            <button id="logout-mobile" class="secondary mobile-logout">
-              Sair
-            </button>
           </div>
         </header>
         <main id="main">
@@ -164,7 +201,7 @@
                   Exportar</small
                 >
               </div>
-              <div class="hero-art" aria-label="Composições de vídeo">
+              <div class="hero-art" aria-hidden="true">
                 <div class="orbit"></div>
                 <div class="mini-clip clip-left">
                   <span>STORY / 9:16</span>
@@ -745,6 +782,7 @@
                     O lote entra na fila do servidor e continua mesmo se você
                     fechar o navegador.
                   </p>
+                  <p id="generate-cost" class="generate-cost"></p>
                   <div class="generate-head">
                     <p id="generate-summary"></p>
                     <button type="button" id="generate-start" class="primary">
@@ -865,6 +903,39 @@
           </footer>
         </main>
       </div>
+      <!-- Phones: four shortcuts plus "Mais", which opens the whole sidebar in #more-sheet. -->
+      <nav class="tabbar" aria-label="Navegação rápida">
+        <a href="#overview" data-nav="overview"
+          ><span aria-hidden="true">◫</span>Início</a
+        ><a href="#projects" data-nav="projects"
+          ><span aria-hidden="true">▱</span>Projetos</a
+        ><a href="#templates" data-nav="templates"
+          ><span aria-hidden="true">＋</span>Criar</a
+        ><a href="#publishing" data-nav="publishing"
+          ><span aria-hidden="true">↗</span>Publicar</a
+        ><button
+          type="button"
+          id="more-button"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="more-sheet"
+        >
+          <span aria-hidden="true">⋯</span>Mais<span
+            id="more-current"
+            class="visually-hidden"
+          ></span>
+        </button>
+      </nav>
+      <dialog id="more-sheet" class="sheet" aria-labelledby="more-title">
+        <div class="sheet-body">
+          <div class="sheet-head">
+            <h2 id="more-title">Menu</h2>
+            <button type="button" class="secondary" id="more-close">
+              Fechar
+            </button>
+          </div>
+        </div>
+      </dialog>
     </div>
     <dialog id="editor">
       <form id="project-form">

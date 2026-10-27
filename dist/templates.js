@@ -13,7 +13,7 @@ import {
   variationCount,
   placement,
 } from "./template-core.js";
-import { bytes } from "./format.js";
+import { bytes, integer, plural } from "./format.js";
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 function el(tag, props = {}, ...children) {
@@ -496,8 +496,21 @@ function syncOutputs() {
   for (const input of $$("#builder input[type=range]:not([data-share])")) {
     const out = input.closest("label")?.querySelector("output");
     if (out) out.textContent = formatValue(input);
+    if (input.dataset.unit)
+      input.setAttribute("aria-valuetext", formatValue(input));
   }
 }
+// <output> is labelable, so a <label class="slider"> names its output instead of
+// the slider; name each slider from the caption it shows.
+for (const input of $$("#builder label.slider input[type=range]"))
+  if (!input.labels.length)
+    input.setAttribute(
+      "aria-label",
+      input
+        .closest("label")
+        .querySelector("span")
+        .firstChild.textContent.trim(),
+    );
 function fillInputs() {
   for (const input of $$("#builder [data-bind]")) {
     if (input === document.activeElement && input.type !== "range") continue;
@@ -1699,6 +1712,28 @@ function renderGenerateSummary() {
     ? "Lote em andamento…"
     : `Gerar ${count} ${count === 1 ? "variação" : "variações"}`;
   button.disabled = running || !count || count > LIMITS.batch || count > left;
+  renderGenerateCost(count, left);
+}
+// Says what the batch costs before the button, and why the button is disabled.
+function renderGenerateCost(count, left) {
+  const target = $("#generate-cost"),
+    over = count > LIMITS.batch || count > left;
+  target.classList.toggle("error", over);
+  if (!state.limits || !count) target.replaceChildren();
+  else if (count > LIMITS.batch)
+    target.textContent = `Cada lote gera até ${LIMITS.batch} variações. Volte a Variações e desmarque mídias ou frases.`;
+  else if (count > left)
+    target.replaceChildren(
+      left > 0
+        ? `Este lote precisa de ${plural(count, "exportação", "exportações")}, mas ${left === 1 ? "resta 1" : "restam " + integer(left)} neste mês. `
+        : "Você já usou todas as exportações do seu plano neste mês. ",
+      el("a", { href: "#billing", text: "Ver planos" }),
+    );
+  else
+    target.textContent =
+      count === left
+        ? `Este lote usa ${count === 1 ? "a última exportação disponível" : "todas as " + integer(left) + " exportações restantes"} neste mês.`
+        : `Este lote usa ${integer(count)} das suas ${plural(left, "exportação restante", "exportações restantes")} neste mês.`;
 }
 function renderGenerate() {
   renderGenerateSummary();

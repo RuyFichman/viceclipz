@@ -8,8 +8,9 @@ export function bytes(n) {
   return number(n / 1024 ** 3, 2) + " GB";
 }
 export const seconds = (n, digits = 1) => number(n, digits) + " s";
+export const integer = (n) => number(n, 0);
 export const plural = (n, one, many) =>
-  number(n, 0) + " " + (n === 1 ? one : many);
+  integer(n) + " " + (n === 1 ? one : many);
 // "2026-10-27" (a calendar day, not an instant) to "27/10/2026" without timezone shifts.
 export function day(value) {
   const [y, m, d] = String(value).split("-");

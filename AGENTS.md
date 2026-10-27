@@ -67,7 +67,7 @@ Implementation is not evidence of external activation. Do not claim that OAuth a
 | `lib/scheduler.mjs` | Publication state transitions and restart recovery |
 | `lib/billing.mjs` | Stripe checkout, portal, webhook ingestion and reconciliation |
 | `lib/server-lock.mjs` | Single-server lock for a data directory |
-| `dist/index.html` | Application markup |
+| `dist/index.html` | Application markup, including the grouped sidebar navigation, the phone tab bar and the "Mais" sheet |
 | `dist/studio.js` | Authentication, projects, editor, uploads and exports UI |
 | `dist/launch.js` | Connections, publication scheduling and plans UI |
 | `dist/account.js` | Verification gate, email-link handling and password recovery UI |
@@ -155,9 +155,12 @@ Use subagents only when explicitly requested by the user or permitted by higher-
 - Product copy is Brazilian Portuguese unless the user requests otherwise. Keep this agent guide in English. Respond to the user in their chosen language.
 - Preserve the dark visual system, the Vice-sunset accent palette (pink, orange and violet tokens defined in `dist/styles.css` `:root`), existing typography and original ViceClipz branding. The palette is color inspiration only; do not use third-party logos, artwork or trademarks.
 - Keep navigation usable on small screens and at reduced viewport heights. Do not hide essential actions in inaccessible overflow.
+- Every studio page has one static link in its sidebar group in `dist/index.html` (Criar, Publicar, Ideias, Conta) and a label in `labels` in `dist/studio.js`; modules create page sections but never navigation links. At 800 px and below the sidebar is hidden: the bottom tab bar holds four shortcuts and "Mais" moves the sidebar into the `#more-sheet` dialog while it is open, so navigation IDs stay unique.
 - Use semantic elements, visible labels, keyboard-accessible controls, visible focus and readable errors. Preserve `hidden`, dialog and form semantics.
+- Readable text is at least 12 px (help and secondary text 12–13 px); smaller text is allowed only inside decorative illustrations marked `aria-hidden`. Keep text contrast at 4.5:1 or more (3:1 for large text). Interactive targets are at least 24 × 24 px, and 44 × 44 px at 800 px and below or on coarse pointers; the shared rules live at the end of `dist/launch.css` (studio) and `dist/growth.css` (public pages). Enlarge the hit area rather than the visual glyph, and note that a `<label>` containing an `<output>` labels the output, not the slider next to it.
 - Element IDs in `dist/index.html` must be unique (a test enforces it): the classic editor and the template builder share the page, and `document.querySelector` silently picks the first match. Format numbers and sizes with `dist/format.js`, not `toFixed`.
 - Provide honest loading, empty, unavailable and error states. Disabled integrations must explain why they are unavailable; do not simulate a successful connection or payment.
+- Mark paid features before the click, not with an error after it: `lockedButton()` in `dist/launch.js` renders the lock and Creator badge with an accessible name naming the plans, and `showUpgrade()` opens Seu plano with the reason (and says so when paid plans are not available yet). The UI reads `plan.social` from `/api/auth/me` (and `enabled` from `/api/integrations`); server-side 403s stay the source of truth.
 - Display the scheduling timezone and destination account before confirmation. Do not silently switch visibility or account targets.
 - Keep prices sourced from configured billing behavior. Do not invent discounts, guarantees, provider approvals, analytics or completed publications.
 - For UI changes, inspect the affected flow in a browser when available. Test with an isolated QA account/data directory, not a real customer's account. Clearly report any browser or mobile verification not performed.
