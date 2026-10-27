@@ -159,6 +159,8 @@ function storage(session) {
   plan = session.plan;
   setLaunchPlan(plan);
   // Scheduling buttons show the lock before the click; redraw when it changes.
+  // Only an explicit social: false locks, so a frontend deployed ahead of its
+  // backend (no plan.social yet) keeps working for paying accounts.
   if (changed) renderJobs();
   $("#plan-label").textContent = "Plano " + plan.name;
   $("#usage-exports").textContent =
@@ -381,7 +383,7 @@ function renderJobs() {
       link.download = "viceclipz.mp4";
       actions.append(link);
       actions.append(
-        plan && !plan.social
+        plan?.social === false
           ? lockedButton("Agendar")
           : button("Agendar", () => openSchedule(j.id)),
       );

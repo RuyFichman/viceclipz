@@ -125,7 +125,7 @@ const publishAction = element("div", "", "actions");
 publishing.append(publishAction);
 function renderPublishAction() {
   publishAction.replaceChildren(
-    plan && !plan.social
+    plan?.social === false
       ? lockedButton("Agendar publicação")
       : action("＋ Agendar publicação", () => openSchedule()),
   );
