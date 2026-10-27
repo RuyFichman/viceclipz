@@ -151,7 +151,88 @@
   color: #b3a3bb;
   border-top: 1px solid #3a2a44;
 }
+.marketing .legal {
+  max-width: 820px;
+  padding-bottom: 64px;
+}
+.marketing .legal h1 {
+  font-size: clamp(38px, 6vw, 64px);
+  margin: 12px 0;
+}
+.marketing .legal h2 {
+  font-size: 24px;
+  margin: 44px 0 12px;
+  scroll-margin-top: 24px;
+}
+.marketing .legal p,
+.marketing .legal li {
+  color: #ddd2e2;
+}
+.marketing .legal li + li {
+  margin-top: 8px;
+}
+.marketing .legal a {
+  color: #ff8fc4;
+  text-underline-offset: 3px;
+}
+.marketing .legal mark {
+  background: #3a2440;
+  color: #ffd2a8;
+  padding: 0 4px;
+  border-radius: 4px;
+}
+.marketing .legal-draft {
+  border: 1px solid #6b4a2a;
+  background: #2a1d14;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+}
+.marketing .legal-meta {
+  font-size: 14px;
+  color: #b3a3bb;
+}
+.marketing .legal-table {
+  overflow-x: auto;
+  border: 1px solid #3a2a44;
+  border-radius: 14px;
+}
+.marketing .legal table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.marketing .legal th,
+.marketing .legal td {
+  text-align: left;
+  vertical-align: top;
+  padding: 12px 16px;
+  border-bottom: 1px solid #3a2a44;
+}
+.marketing .legal tr:last-child td {
+  border-bottom: 0;
+}
+.marketing .legal th {
+  color: #c9a7ff;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.marketing .legal td:first-child {
+  width: 42%;
+  font-weight: 600;
+}
+.marketing .legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-bottom: 10px;
+}
+.marketing .legal-links [aria-current="page"] {
+  color: #ff8fc4;
+}
 .marketing a:focus-visible,
+.marketing .legal-table:focus-visible,
 .marketing summary:focus-visible {
   outline: 3px solid #ff4fa3;
   outline-offset: 5px;

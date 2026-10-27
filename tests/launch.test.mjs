@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID, randomBytes } from "node:crypto";
 import { createServer } from "node:http";
-import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 process.env.DATA_DIR = path.resolve(".test-data-launch-" + randomUUID());
@@ -28,7 +28,8 @@ const social = await import("../lib/social.mjs");
 const billing = await import("../lib/billing.mjs");
 const { processPost, recoverPosts } = await import("../lib/scheduler.mjs");
 const { api, json } = await import("../lib/api.mjs");
-const { createSession } = await import("../lib/auth.mjs");
+const { createSession, passwordHash } = await import("../lib/auth.mjs");
+const { assetPath, outputPath } = await import("../lib/config.mjs");
 const { build, deploymentConfig } = await import("../build-vercel.mjs");
 const { backup } = await import("../backup.mjs");
 const user = randomUUID(),
@@ -519,6 +520,14 @@ await test("Etapa 3: integrações, fila, cobrança e deploy", async (t) => {
         );
         const files = await readdir(path.join(output, "static"));
         assert(files.includes("launch.js"));
+        for (const page of ["termos", "privacidade", "retencao", "suporte"]) {
+          assert(files.includes(page + ".html"));
+          assert(
+            config.routes.some(
+              (r) => r.src === "/" + page && r.dest === "/" + page + ".html",
+            ),
+          );
+        }
         assert(!files.some((f) => /env|sqlite|server|worker/.test(f)));
       },
     );
@@ -625,6 +634,302 @@ await test("Etapa 3: integrações, fila, cobrança e deploy", async (t) => {
         } finally {
           globalThis.fetch = original;
         }
+      },
+    );
+    await t.test(
+      "planos mostram o preço mensal configurado no Stripe",
+      async () => {
+        let calls = 0;
+        const client = {
+          prices: {
+            retrieve: async (id) => {
+              calls++;
+              return {
+                active: id === "price_creator",
+                type: "recurring",
+                recurring: { interval: "month", interval_count: 1 },
+                unit_amount: 4900,
+                currency: "brl",
+              };
+            },
+          },
+        };
+        const info = await billing.billingInfo(other, client),
+          byKey = Object.fromEntries(info.plans.map((p) => [p.key, p]));
+        assert.equal(byKey.free.price, null);
+        assert.deepEqual(byKey.creator.price, {
+          amount: 4900,
+          currency: "BRL",
+          interval: "month",
+        });
+        assert.equal(byKey.studio.price, null, "inactive price is hidden");
+        assert.equal(byKey.studio.storage, 5 * 1024 ** 3);
+        const failing = {
+          prices: {
+            retrieve: async () => {
+              throw Error("offline");
+            },
+          },
+        };
+        assert.deepEqual(
+          (await billing.billingInfo(other, failing)).plans[1].price,
+          byKey.creator.price,
+          "cached price survives a provider outage",
+        );
+        assert.equal(calls, 2);
+      },
+    );
+    await t.test(
+      "exclusão de conta exige senha, respeita assinatura e envios e apaga tudo do titular",
+      async () => {
+        const id = randomUUID(),
+          password = "senha-de-teste-123",
+          customer = "cus_deleted_" + id.slice(0, 8);
+        run(
+          "INSERT INTO users VALUES(?,?,?,?,?)",
+          id,
+          id + "@example.test",
+          "Removível",
+          await passwordHash(password),
+          now,
+        );
+        const auth = session(id),
+          [asset, proj, doneJob, runningJob, queuedJob, conn, postId] =
+            Array.from({ length: 7 }, () => randomUUID());
+        run(
+          "INSERT INTO assets VALUES(?,?,?,?,?,?,?,?,?)",
+          asset,
+          id,
+          "Imagem",
+          10,
+          0,
+          10,
+          10,
+          0,
+          now,
+        );
+        run(
+          "INSERT INTO asset_kinds VALUES(?,?,?)",
+          asset,
+          "image",
+          "image/png",
+        );
+        run("INSERT INTO projects VALUES(?,?,?,?,?)", proj, id, "{}", 1, now);
+        for (const [jobId, state] of [
+          [doneJob, "done"],
+          [runningJob, "running"],
+          [queuedJob, "queued"],
+        ]) {
+          run(
+            "INSERT INTO jobs(id,user_id,project_id,fingerprint,snapshot,state,created,updated) VALUES(?,?,?,?,?,?,?,?)",
+            jobId,
+            id,
+            proj,
+            jobId,
+            "{}",
+            state,
+            now,
+            now,
+          );
+          run(
+            "INSERT INTO usage_events VALUES(?,?,?,?,?)",
+            jobId,
+            id,
+            store.month(),
+            state === "done" ? "completed" : "reserved",
+            now,
+          );
+        }
+        await writeFile(assetPath(asset), "image");
+        await writeFile(outputPath(doneJob), "mp4");
+        run(
+          "INSERT INTO social_connections VALUES(?,?,?,?,?,?,?,'connected',?)",
+          conn,
+          id,
+          "instagram",
+          "remote-removable",
+          "removivel",
+          store.seal({ access_token: "removable-token" }),
+          now + 86400000,
+          now,
+        );
+        run(
+          "INSERT INTO scheduled_posts(id,user_id,job_id,connection_id,request_key,due,timezone,title,caption,privacy,made_for_kids,status,next_run,created,updated) VALUES(?,?,?,?,?,?,?,?,?,?,?,'publishing',?,?,?)",
+          postId,
+          id,
+          doneJob,
+          conn,
+          randomUUID(),
+          now + 3600000,
+          "America/Sao_Paulo",
+          "Título",
+          "Legenda",
+          "public",
+          0,
+          now,
+          now,
+          now,
+        );
+        run("INSERT INTO billing_customers VALUES(?,?)", id, customer);
+        run(
+          "INSERT INTO subscriptions VALUES(?,?,?,?,?,?,?,?)",
+          "sub_" + id,
+          id,
+          customer,
+          "price_creator",
+          "active",
+          now + 86400000,
+          0,
+          now,
+        );
+        run(
+          "INSERT INTO billing_events(id,type,payload,next_run,created) VALUES(?,?,?,?,?)",
+          "evt_" + id,
+          "invoice.paid",
+          JSON.stringify({ data: { object: { customer } } }),
+          now,
+          now,
+        );
+        run(
+          "INSERT INTO discovery_items VALUES(?,?,?,?,?,?,?,?)",
+          randomUUID(),
+          id,
+          "https://example.test/" + id,
+          "site",
+          "Título",
+          "Descrição",
+          "Autor",
+          now,
+        );
+        run(
+          "INSERT INTO saved_profiles VALUES(?,?,?,?,?)",
+          randomUUID(),
+          id,
+          "Perfil",
+          "{}",
+          now,
+        );
+        run(
+          "INSERT INTO ai_requests VALUES(?,?,?,?)",
+          randomUUID(),
+          id,
+          store.month(),
+          now,
+        );
+        run("INSERT INTO verified_accounts VALUES(?,?)", id, now);
+        const remove = (data, expected) =>
+          call("/auth/delete-account", {
+            method: "POST",
+            auth,
+            data,
+            expected,
+          });
+        await remove({ password, confirm: "excluir" }, 400);
+        await remove({ password: "senha-errada-000", confirm: "EXCLUIR" }, 403);
+        await call("/auth/delete-account", {
+          method: "POST",
+          auth,
+          data: { password, confirm: "EXCLUIR" },
+          headers: { "X-ViceClipz": "" },
+          expected: 403,
+        });
+        assert.match(
+          (await remove({ password, confirm: "EXCLUIR" }, 409)).error,
+          /Cancele sua assinatura/,
+        );
+        run("UPDATE subscriptions SET cancel_at_end=1 WHERE user_id=?", id);
+        assert.match(
+          (await remove({ password, confirm: "EXCLUIR" }, 409)).error,
+          /sendo enviada/,
+        );
+        run("UPDATE scheduled_posts SET status='queued' WHERE id=?", postId);
+        assert.match(
+          (await remove({ password, confirm: "EXCLUIR" }, 409)).error,
+          /Interrompemos/,
+        );
+        assert.equal(
+          one("SELECT state FROM jobs WHERE id=?", runningJob).state,
+          "cancelling",
+        );
+        assert.equal(
+          one("SELECT state FROM jobs WHERE id=?", queuedJob).state,
+          "cancelled",
+        );
+        assert.equal(
+          one("SELECT state FROM usage_events WHERE job_id=?", queuedJob).state,
+          "released",
+        );
+        assert(
+          one("SELECT id FROM users WHERE id=?", id),
+          "nothing removed yet",
+        );
+        // The worker acknowledges the cancellation.
+        run("UPDATE jobs SET state='cancelled' WHERE id=?", runningJob);
+        const response = await fetch(base + "/api/auth/delete-account", {
+          method: "POST",
+          headers: {
+            Cookie: auth,
+            "X-ViceClipz": "studio",
+            Origin: process.env.APP_ORIGIN,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ password, confirm: "EXCLUIR" }),
+        });
+        assert.equal(response.status, 200);
+        assert.match(response.headers.get("set-cookie"), /Max-Age=0/);
+        const owned = db
+          .prepare(
+            "SELECT m.name FROM sqlite_master m WHERE m.type='table' AND EXISTS (SELECT 1 FROM pragma_table_info(m.name) WHERE name='user_id')",
+          )
+          .all()
+          .map((t) => t.name);
+        assert(owned.length >= 19);
+        for (const table of owned)
+          assert.equal(
+            one(`SELECT count(*) n FROM ${table} WHERE user_id=?`, id).n,
+            0,
+            table,
+          );
+        assert.equal(one("SELECT count(*) n FROM users WHERE id=?", id).n, 0);
+        assert.equal(
+          one("SELECT count(*) n FROM asset_kinds WHERE asset_id=?", asset).n,
+          0,
+        );
+        assert.equal(
+          one("SELECT count(*) n FROM billing_events WHERE id=?", "evt_" + id)
+            .n,
+          0,
+        );
+        await assert.rejects(stat(assetPath(asset)), { code: "ENOENT" });
+        await assert.rejects(stat(outputPath(doneJob)), { code: "ENOENT" });
+        await call("/auth/me", { auth, expected: 401 });
+        assert(
+          one("SELECT id FROM users WHERE id=?", user),
+          "others untouched",
+        );
+        assert(one("SELECT id FROM jobs WHERE id=?", job));
+        // Later Stripe events for the removed customer are accepted without a retry loop.
+        await billing.applyEvent(
+          {
+            type: "customer.subscription.deleted",
+            data: { object: { id: "sub_" + id } },
+          },
+          {
+            subscriptions: {
+              retrieve: async () => ({
+                id: "sub_" + id,
+                customer,
+                metadata: { viceclipz_user_id: id },
+                status: "canceled",
+                items: { data: [] },
+              }),
+            },
+          },
+        );
+        assert.equal(
+          one("SELECT count(*) n FROM subscriptions WHERE user_id=?", id).n,
+          0,
+        );
       },
     );
     await t.test(

@@ -483,6 +483,27 @@ await test("Account security: verification, recovery and transactional email", a
         }
       },
     );
+    await t.test(
+      "an unverified holder can delete the account and its pending email",
+      async () => {
+        const u = await register();
+        assert(latest(u.id, "verify"));
+        await request("/auth/delete-account", {
+          data: { password: u.password, confirm: "EXCLUIR" },
+          cookie: u.cookie,
+        });
+        assert.equal(one("SELECT count(*) n FROM users WHERE id=?", u.id).n, 0);
+        assert.equal(
+          one("SELECT count(*) n FROM account_mail WHERE user_id=?", u.id).n,
+          0,
+        );
+        await request("/auth/me", { cookie: u.cookie, expected: 401 });
+        await request("/auth/login", {
+          data: { email: u.email, password: u.password },
+          expected: 401,
+        });
+      },
+    );
   } finally {
     await new Promise((resolve) => server.close(resolve));
     db.close();

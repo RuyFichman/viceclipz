@@ -1,3 +1,4 @@
+import { openAccountDeletion } from "./account.js";
 const $ = (s) => document.querySelector(s);
 const names = { instagram: "Instagram", youtube: "YouTube" };
 const states = {
@@ -69,7 +70,10 @@ function section(id, title, copy) {
   $("#main").insertBefore(s, $("#main footer"));
   const a = element("a", title);
   a.prepend(
-    element("span", { integrations: "◎", publishing: "↗", billing: "◇" }[id]),
+    element(
+      "span",
+      { integrations: "◎", publishing: "↗", billing: "◇", account: "◉" }[id],
+    ),
   );
   a.href = "#" + id;
   a.dataset.nav = id;
@@ -99,6 +103,18 @@ const billing = section(
 );
 billing.innerHTML +=
   '<div id="billing-summary" class="launch-card"></div><div id="plan-cards" class="launch-grid"></div><p class="field-help">A assinatura só libera os recursos após confirmação do Stripe. A cota de exportações renova no primeiro dia de cada mês, em UTC. Exportações concluídas contam mesmo depois de removidas.</p>';
+const account = section(
+  "account",
+  "Sua conta",
+  "Seus dados de acesso, documentos e a exclusão da conta.",
+);
+account.querySelector(".eyebrow").textContent = "PRIVACIDADE E CONTROLE";
+account.innerHTML +=
+  '<div class="launch-grid"><article class="launch-card"><h2>Dados de acesso</h2><p id="account-name"></p><p id="account-address"></p><small>Para trocar a senha, saia e use Esqueci minha senha na tela de entrada.</small></article><article class="launch-card"><h2>Documentos</h2><p><a href="/termos" target="_blank" rel="noopener">Termos de uso ↗</a></p><p><a href="/privacidade" target="_blank" rel="noopener">Política de privacidade ↗</a></p><p><a href="/retencao" target="_blank" rel="noopener">Política de retenção ↗</a></p><p><a href="/suporte" target="_blank" rel="noopener">Suporte e contato ↗</a></p></article><article class="launch-card" id="account-removal"><h2>Excluir conta</h2><p>Remove definitivamente seu cadastro, arquivos, projetos, exportações, conexões e agendamentos deste servidor.</p><small>Cancele antes qualquer assinatura ativa. Publicações já feitas continuam nas redes.</small></article></div>';
+const removeButton = element("button", "Excluir minha conta", "danger");
+removeButton.type = "button";
+removeButton.onclick = openAccountDeletion;
+$("#account-removal").append(removeButton);
 const alert = element("p", "", "error");
 alert.id = "launch-message";
 alert.setAttribute("role", "status");
@@ -325,6 +341,19 @@ async function schedules() {
     target.append(row);
   }
 }
+function priceText(price) {
+  const format = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: price.currency,
+  });
+  const digits = format.resolvedOptions().maximumFractionDigits;
+  return format.format(price.amount / 10 ** digits) + "/mês";
+}
+async function profile() {
+  const { user } = await api("/auth/me");
+  $("#account-name").textContent = user.name;
+  $("#account-address").textContent = user.email;
+}
 async function plans() {
   const info = await api("/billing"),
     summary = $("#billing-summary");
@@ -368,6 +397,15 @@ async function plans() {
     const card = element("article", "", "launch-card");
     card.append(
       element("h2", p.name),
+      element(
+        "p",
+        p.key === "free"
+          ? "Sem cobrança"
+          : p.price
+            ? priceText(p.price)
+            : "Preço exibido no checkout",
+        "plan-price",
+      ),
       element("p", p.renders + " exportações / mês"),
       element("p", p.storage / 1024 ** 3 + " GB para seus arquivos"),
       element(
@@ -380,7 +418,7 @@ async function plans() {
     if (p.key !== "free")
       card.append(
         action(
-          "Ver preço e assinar",
+          p.price ? "Assinar " + p.name : "Ver preço e assinar",
           async () =>
             location.assign(
               (await api("/billing/checkout", "POST", { plan: p.key })).url,
@@ -404,6 +442,7 @@ export async function refreshLaunch() {
     integrations: connections,
     publishing: schedules,
     billing: plans,
+    account: profile,
   }[page];
   if (!fn) return;
   loading = true;
@@ -425,6 +464,8 @@ export function setLaunchSession(value) {
       "schedule-list",
       "billing-summary",
       "plan-cards",
+      "account-name",
+      "account-address",
     ])
       $("#" + id).replaceChildren();
   } else {

@@ -162,6 +162,7 @@
 }
 .auth-box .text-button {
   display: block;
+  margin: 22px 0;
 }
 #forgot-password {
   margin-top: -12px;

@@ -39,9 +39,11 @@ Implementation is not evidence of external activation. Do not claim that OAuth a
 | `lib/db.mjs` | Native SQLite connection, base schema and database helpers |
 | `lib/auth.mjs` | Password hashing, sessions and login throttling |
 | `lib/account.mjs` | Verification/recovery tokens, account guards, persistent throttling and transactional email outbox |
+| `lib/account-deletion.mjs` | Holder-initiated account erasure: password check, subscription/publication/render guards, fixed owned-table list and file removal |
 | `lib/discovery-fetch.mjs` | Bounded HTTPS, pinned public DNS, redirects and robots.txt |
 | `lib/discovery.mjs` | Reference parsing/storage, social metadata, limits and metrics |
 | `dist/discovery.js`, `dist/growth.css`, `dist/landing.html` | References, metrics and public presentation |
+| `dist/termos.html`, `dist/privacidade.html`, `dist/retencao.html`, `dist/suporte.html` | Draft legal and support pages pending legal review (bracketed placeholders); see `docs/JURIDICO.md` |
 | `tests/discovery.test.mjs` | Collector safety, parsers, adapters, ownership, quotas and metrics |
 | `lib/api.mjs` | Authenticated asset/project/export API, ownership checks and quotas |
 | `lib/composition.mjs` | Project validation, format definitions and canvas overlays |
@@ -171,6 +173,7 @@ Use subagents only when explicitly requested by the user or permitted by higher-
 - Preserve single-use, expiring, purpose-bound account tokens and transactional consumption after asynchronous password hashing. Verification/reset revoke account sessions and pending OAuth states; reset also invalidates other account links.
 - Keep recovery responses uniform for known/unknown addresses and preserve per-address/IP limits. Do not log tokens, new passwords or message bodies, and do not send real email from automated tests.
 - Account links use URL fragments and explicit POST confirmation, not state-changing GET requests. Clear tokens from the visible URL and avoid persistent browser storage.
+- Account deletion requires the current password, stays available before email verification, and must not run while a chargeable subscription, an in-flight publication or an active render exists. Every new table with a `user_id` column must be added to `OWNED_TABLES` in `lib/account-deletion.mjs`; the deletion test fails otherwise.
 
 ## Data, schema and media invariants
 
@@ -296,7 +299,7 @@ On Windows, inspect the exact port/process and command before restarting a serve
 
 ## Known launch gaps and definition of done
 
-A public product presentation is now implemented at `/sobre`. Commercial prices/terms, legal pages and a real public product demonstration remain launch follow-ups. Reference collection and studio metrics are locally tested; external provider validation is still required.
+A public product presentation is now implemented at `/sobre`. Draft terms, privacy, retention and support pages exist at `/termos`, `/privacidade`, `/retencao` and `/suporte`; they contain bracketed placeholders and are not final until legal review (`docs/JURIDICO.md`). Do not present them as reviewed or invent company data to fill them. Launch prices (Creator R$ 49, Studio R$ 99 per month) live only in Stripe; the UI reads them from the configured prices. A real public product demonstration remains a launch follow-up. Reference collection and studio metrics are locally tested; external provider validation is still required.
 
 Template batches are locally tested with real FFmpeg renders; batch render times on the production VPS and phrase suggestions against the live provider are not yet validated. Phrase suggestions must stay grounded in the user's description: keep the no-invented-facts prompt, strict output validation, per-account limits, and never log descriptions, outputs or keys.
 

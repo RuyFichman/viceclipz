@@ -66,10 +66,10 @@ Comece em modo de teste. Crie dois preços **recorrentes mensais**, Creator e St
 - Configure STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET e os dois STRIPE_*_PRICE_ID no backend.
 - Webhook: `APP_ORIGIN/api/billing/webhook`. Eventos: checkout.session.completed, customer.subscription.created/updated/deleted, invoice.paid e invoice.payment_failed.
 - Ative o Customer Portal com cancelamento e troca entre os preços cadastrados.
-- Seu plano → Ver preço e assinar abre checkout com preço/moeda antes da confirmação. Acesso só é concedido após webhook assinado e consulta da assinatura atual.
+- Cadastre cada preço como recorrente, mensal e ativo (preços de lançamento: Creator R$ 49 e Studio R$ 99). Seu plano exibe o valor lido do Stripe (cache de 10 minutos; 1 minuto após falha) e, sem resposta válida, mostra "Preço exibido no checkout". O valor nunca fica no código. Assinar abre o checkout com preço/moeda antes da confirmação. Acesso só é concedido após webhook assinado e consulta da assinatura atual.
 - Valide assinatura, cancelamento, renovação e pagamento recusado em teste. Depois configure preços, chaves e webhook live, sem misturar ambientes.
 
-Grátis: 10 exportações/mês, 2 GB, sem redes. Creator: 100/mês, 2 GB e redes. Studio: 500/mês, 10 GB e redes. A cota renova por mês-calendário UTC. Falhas/cancelamentos liberam reserva; MP4 concluído conta mesmo apagado. Retry do mesmo job não duplica o ledger. Assinatura expirada, preço desconhecido ou status fora de active/trialing retorna ao grátis. Downgrade não apaga arquivos existentes.
+Grátis: 10 exportações/mês, 2 GB, sem redes. Creator: 100/mês, 2 GB e redes. Studio: 500/mês, 5 GB e redes. A cota renova por mês-calendário UTC. Falhas/cancelamentos liberam reserva; MP4 concluído conta mesmo apagado. Retry do mesmo job não duplica o ledger. Assinatura expirada, preço desconhecido ou status fora de active/trialing retorna ao grátis. Downgrade não apaga arquivos existentes.
 
 ## Operação e backup
 
@@ -85,7 +85,7 @@ Este pacote prepara o beta; **não declara o lançamento público concluído**. 
 
 - Smoke test pela URL Vercel: cadastro convidado, login, upload acima de 4,5 MB, MP4, download/range, OAuth, publicação real em conta de teste e assinatura Stripe de teste.
 - Aprovação Meta (Google se ativado), callbacks e webhooks acessíveis sem Deployment Protection.
-- Preços/custos, suporte, termos, privacidade, retenção e fluxo de exclusão de dados. Dados jurídicos e páginas comerciais ainda não foram fornecidos.
+- Revisão jurídica e preenchimento das minutas `/termos`, `/privacidade`, `/retencao` e `/suporte` (campos entre colchetes; ver [pendências jurídicas](JURIDICO.md)). A exclusão de conta pelo titular está implementada; a URL de instruções de exclusão para a Meta é `APP_ORIGIN/privacidade#exclusao`.
 - Validar a entrega real de e-mail e os fluxos de confirmação/recuperação na URL pública. A implementação e os testes locais estão no [guia de contas](CONTAS-EMAIL.md); domínio de envio e credenciais ainda exigem configuração.
 - Backups externos e restauração ensaiada no servidor de destino; monitoramento de saúde, espaço e falhas.
 

@@ -23,6 +23,10 @@ const files = {
   "/templates.css": "templates.css",
   "/sobre": "landing.html",
   "/landing.html": "landing.html",
+  "/termos": "termos.html",
+  "/privacidade": "privacidade.html",
+  "/retencao": "retencao.html",
+  "/suporte": "suporte.html",
   "/favicon.ico": null,
 };
 let worker,
