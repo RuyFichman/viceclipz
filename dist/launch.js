@@ -1,5 +1,5 @@
 import { openAccountDeletion } from "./account.js";
-import { bytes, plural } from "./format.js";
+import { bytes, integer, plural } from "./format.js";
 const $ = (s) => document.querySelector(s);
 const names = { instagram: "Instagram", youtube: "YouTube" };
 const states = {
@@ -140,7 +140,7 @@ const billing = section(
   "Acompanhe seu uso e gerencie sua assinatura com segurança.",
 );
 billing.innerHTML +=
-  '<p id="plan-notice" class="plan-notice" tabindex="-1" hidden></p><div id="billing-summary" class="launch-card"></div><div id="plan-cards" class="launch-grid"></div><p class="field-help">A assinatura só libera os recursos após confirmação do Stripe. A cota de exportações renova no primeiro dia de cada mês, em UTC. Exportações concluídas contam mesmo depois de removidas.</p>';
+  '<p id="plan-notice" class="plan-notice" tabindex="-1" hidden></p><div id="billing-summary" class="launch-card plan-summary"></div><h2 class="plans-title">Compare os planos</h2><div id="plan-cards" class="launch-grid plan-cards"></div><p class="field-help">A assinatura só libera os recursos depois que o Stripe confirma o pagamento. A cota de exportações renova no primeiro dia de cada mês, em UTC. Cada MP4 concluído conta uma exportação, inclusive cada variação de um lote, e continua contando mesmo depois de removido; falhas e cancelamentos devolvem a cota.</p>';
 const account = section(
   "account",
   "Sua conta",
@@ -392,8 +392,48 @@ async function profile() {
   $("#account-name").textContent = user.name;
   $("#account-address").textContent = user.email;
 }
+const SUBSCRIPTION = {
+  active: "Assinatura ativa",
+  trialing: "Período de teste",
+  past_due: "Pagamento em atraso",
+  unpaid: "Pagamento não realizado",
+  canceled: "Assinatura cancelada",
+  incomplete: "Aguardando confirmação do pagamento",
+  incomplete_expired: "Pagamento não concluído",
+  paused: "Assinatura pausada",
+};
+const shortDate = (ms) => new Intl.DateTimeFormat("pt-BR").format(ms);
+// The monthly quota is counted per calendar month in UTC.
+function renewal() {
+  const now = new Date(),
+    next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  return "1º/" + String(next.getUTCMonth() + 1).padStart(2, "0");
+}
+function meter(label, value, ratio, note) {
+  const box = element("div", "", "plan-meter"),
+    head = element("p"),
+    bar = element("div", "", "meter"),
+    fill = element("i");
+  head.append(element("span", label), element("strong", value));
+  bar.setAttribute("aria-hidden", "true");
+  bar.hidden = ratio === null;
+  bar.classList.toggle("full", ratio >= 0.9);
+  fill.style.width = Math.min(100, (ratio || 0) * 100) + "%";
+  bar.append(fill);
+  box.append(head, bar, element("small", note));
+  return box;
+}
+function feature(text, included = true) {
+  const li = element("li", text, included ? "" : "no"),
+    mark = element("span", included ? "✓" : "—");
+  mark.setAttribute("aria-hidden", "true");
+  li.prepend(mark);
+  return li;
+}
+const portal = async () =>
+  location.assign((await api("/billing/portal", "POST")).url);
 async function plans() {
-  const info = await api("/billing"),
+  const [info, me] = await Promise.all([api("/billing"), api("/auth/me")]),
     summary = $("#billing-summary"),
     notice = $("#plan-notice");
   notice.hidden = !upgrade;
@@ -407,47 +447,97 @@ async function plans() {
     announce = false;
     notice.focus();
   }
-  summary.replaceChildren(
+  const local = info.plan.key === "local",
+    sub = info.subscription,
+    // Same rule the server uses to refuse a second checkout.
+    subscribed = Boolean(
+      sub && !["canceled", "incomplete_expired"].includes(sub.status),
+    ),
+    left = info.plan.renders - info.used,
+    head = element("div", "", "plan-summary-head"),
+    title = element("div"),
+    meters = element("div", "", "plan-meters");
+  title.append(
     element("p", "PLANO ATUAL", "eyebrow"),
     element("h2", info.plan.name),
-    element(
-      "p",
-      info.plan.key === "local"
-        ? plural(info.used, "exportação usada", "exportações usadas") +
-            " este mês"
-        : `${info.used} de ${plural(info.plan.renders, "exportação usada", "exportações usadas")} este mês`,
-    ),
-    element(
-      "small",
-      info.configured
-        ? info.mode === "test"
-          ? "Stripe em modo de teste. Não use cartões reais."
-          : "Cobrança processada pelo Stripe."
-        : "As assinaturas estarão disponíveis após configuração do serviço.",
-    ),
   );
-  if (info.subscription)
-    summary.append(
+  if (sub)
+    title.append(
       element(
         "p",
-        "Assinatura: " +
-          info.subscription.status +
-          (info.subscription.cancel_at_end
-            ? " · cancelamento ao fim do período"
-            : ""),
-      ),
-      action(
-        "Gerenciar assinatura",
-        async () => location.assign((await api("/billing/portal", "POST")).url),
-        !info.configured,
+        (SUBSCRIPTION[sub.status] || "Assinatura: " + sub.status) +
+          (sub.period_end && sub.cancel_at_end
+            ? " · termina em " + shortDate(sub.period_end)
+            : sub.period_end && sub.status === "active"
+              ? " · renova em " + shortDate(sub.period_end)
+              : ["past_due", "unpaid", "incomplete", "paused"].includes(
+                    sub.status,
+                  )
+                ? " · resolva no portal do Stripe para liberar o plano"
+                : ""),
+        "plan-status",
       ),
     );
+  head.append(title);
+  if (sub && info.configured)
+    head.append(action("Gerenciar assinatura", portal));
+  meters.append(
+    meter(
+      "Exportações este mês",
+      local
+        ? integer(info.used)
+        : integer(info.used) + " de " + integer(info.plan.renders),
+      local ? null : info.used / info.plan.renders,
+      local
+        ? "Sem limite no desenvolvimento local."
+        : (left <= 0 ? "Você usou todas as exportações deste mês. " : "") +
+            "A cota renova em " +
+            renewal() +
+            " (UTC).",
+    ),
+    meter(
+      "Armazenamento",
+      bytes(me.usage) + " de " + bytes(me.storageLimit),
+      me.usage / me.storageLimit,
+      "Arquivos da biblioteca e MP4 exportados.",
+    ),
+  );
+  summary.replaceChildren(
+    head,
+    meters,
+    element(
+      "small",
+      !info.configured
+        ? "As assinaturas ainda não estão disponíveis."
+        : info.mode === "test"
+          ? "Stripe em modo de teste. Não use cartões reais."
+          : "Pagamentos processados com segurança pelo Stripe.",
+    ),
+  );
   const target = $("#plan-cards");
   target.replaceChildren();
   for (const p of info.plans) {
-    const card = element("article", "", "launch-card");
+    const current = p.key === info.plan.key,
+      recommended =
+        p.key === "creator" && ["free", "local"].includes(info.plan.key),
+      card = element("article", "", "launch-card plan-card"),
+      features = element("ul", "", "plan-features"),
+      actions = element("div", "", "plan-actions");
+    card.classList.toggle("current", current);
+    card.classList.toggle("recommended", recommended);
+    if (current || recommended)
+      card.append(
+        element("p", current ? "Seu plano atual" : "Recomendado", "plan-flag"),
+      );
+    features.append(
+      feature(plural(p.renders, "exportação", "exportações") + " por mês"),
+      feature(bytes(p.storage) + " de armazenamento"),
+      p.social
+        ? feature("Publicação agendada nas redes conectadas")
+        : feature("Sem publicação agendada", false),
+    );
     card.append(
-      element("h2", p.name),
+      element("h3", p.name),
       p.key === "free" || p.price
         ? element(
             "p",
@@ -455,32 +545,48 @@ async function plans() {
             "plan-price",
           )
         : element("small", "O preço aparece no checkout seguro do Stripe."),
-      element("p", plural(p.renders, "exportação", "exportações") + " / mês"),
-      element("p", bytes(p.storage) + " para seus arquivos"),
-      element(
-        "p",
-        p.social
-          ? "Agendamento para redes conectadas"
-          : "Edição e exportação MP4",
-      ),
+      features,
     );
-    if (p.key !== "free")
-      card.append(
-        action(
-          p.price ? "Assinar " + p.name : "Ver preço e assinar",
-          async () =>
-            location.assign(
-              (await api("/billing/checkout", "POST", { plan: p.key })).url,
-            ),
-          !info.configured ||
-            Boolean(
-              info.subscription &&
-              !["canceled", "incomplete_expired"].includes(
-                info.subscription.status,
+    // Every unavailable action says why, next to it.
+    if (p.key === "free") {
+      if (!current && subscribed)
+        actions.append(
+          element(
+            "small",
+            "Para voltar ao Grátis, cancele a assinatura no portal do Stripe.",
+          ),
+        );
+    } else if (!current) {
+      if (!info.configured)
+        actions.append(
+          action("Assinar " + p.name, async () => {}, true),
+          element("small", "Assinaturas ainda não disponíveis."),
+        );
+      else if (subscribed)
+        actions.append(
+          action("Gerenciar assinatura", portal),
+          element(
+            "small",
+            "Você já tem uma assinatura. Gerencie ou cancele no portal do Stripe antes de assinar outro plano.",
+          ),
+        );
+      else {
+        actions.append(
+          action(
+            p.price ? "Assinar " + p.name : "Ver preço e assinar",
+            async () =>
+              location.assign(
+                (await api("/billing/checkout", "POST", { plan: p.key })).url,
               ),
-            ),
-        ),
-      );
+          ),
+        );
+        if (info.mode === "test")
+          actions.append(
+            element("small", "Modo de teste: use apenas cartões de teste."),
+          );
+      }
+    }
+    if (actions.childNodes.length) card.append(actions);
     target.append(card);
   }
 }

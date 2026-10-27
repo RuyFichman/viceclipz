@@ -387,3 +387,127 @@ body:has(#more-sheet[open]) {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+/* Seu plano: usage summary and comparable plan cards. */
+.plan-summary {
+  gap: 20px;
+}
+.plan-summary-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.plan-summary-head .eyebrow {
+  margin-bottom: 8px;
+}
+.plan-summary h2 {
+  font-size: 26px;
+}
+.plan-status {
+  margin-top: 6px;
+  color: #ded5e6;
+}
+.plan-meters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px 32px;
+}
+.plan-meter > p {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: 0 0 8px;
+  color: #cfc8d8;
+}
+.plan-meter strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.meter {
+  height: 8px;
+  border-radius: 999px;
+  background: #352a3d;
+  overflow: hidden;
+}
+.meter i {
+  display: block;
+  height: 100%;
+  background: var(--sunset);
+}
+.meter.full i {
+  background: var(--orange);
+}
+.plan-meter small {
+  margin-top: 6px;
+}
+.plans-title {
+  margin: 34px 0 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+.plan-card.recommended {
+  border-color: #6b3a6e;
+}
+.plan-card.current {
+  border-color: var(--accent);
+}
+.plan-cards {
+  align-items: stretch;
+  margin-top: 30px;
+  row-gap: 30px;
+}
+.plan-card {
+  position: relative;
+}
+/* The flag sits on the top border so every card's name and price line up. */
+.plan-flag {
+  position: absolute;
+  top: -13px;
+  left: 22px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #2d1631;
+  color: #ffc4e2;
+  font-size: 12px;
+  font-weight: 650;
+}
+.plan-card.current .plan-flag {
+  background: var(--sunset);
+  color: var(--ink);
+}
+.plan-card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+.plan-features {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.plan-features li {
+  display: flex;
+  gap: 10px;
+  line-height: 1.5;
+}
+.plan-features li > span {
+  flex: none;
+  width: 14px;
+  color: var(--accent);
+}
+.plan-features li.no {
+  color: #a29bae;
+}
+.plan-features li.no > span {
+  color: #8a8396;
+}
+.plan-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  margin-top: auto;
+  padding-top: 6px;
+}
